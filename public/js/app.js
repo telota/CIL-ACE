@@ -2494,20 +2494,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       items: [],
       itemsDetails: {},
       checkboxes: [{
-        value: 'has-imprints',
+        value: 'has_imprints',
         label: 'Abklatsche'
       }, {
-        value: 'has-imprints-3d',
+        value: 'has_imprints_3d',
         label: '3D-Abklatsche'
       }, {
-        value: 'has-fotos',
+        value: 'has_fotos',
         label: 'Fotos'
       }, {
-        value: 'has-scheden',
+        value: 'has_scheden',
         label: 'Scheden'
       }],
       query: {},
-      queryKeys: ['id', 'name', 'KO', 'has-imprints', 'has-imprints-3d', 'has-fotos', 'has-scheden'],
+      queryKeys: ['id', 'name', 'KO', 'has_imprints', 'has_imprints_3d', 'has_fotos', 'has_scheden'],
       abbreviations: {
         active: false,
         search: ''
@@ -2626,6 +2626,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var _fetch$contents;
+
         var fetch;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -2642,7 +2644,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 fetch = _context.sent;
 
                 // Check if result
-                if (fetch.contents[0]) {// this.filterExpanded = false
+                if (fetch !== null && fetch !== void 0 && (_fetch$contents = fetch.contents) !== null && _fetch$contents !== void 0 && _fetch$contents[0]) {// this.filterExpanded = false
                 } else {
                   _this2.no_result = 'Die Suche erbrachte kein Ergebnis.';
                   setTimeout(function () {
@@ -2651,18 +2653,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 } // JK: Set Pagination
 
 
-                _this2.pagination.count = fetch.count;
-                _this2.pagination.page = fetch.page;
-                _this2.pagination.first = fetch.previousPage ? fetch.firstPage : null;
-                _this2.pagination.previous = fetch.previousPage;
-                _this2.pagination.next = fetch.nextPage;
-                _this2.pagination.last = fetch.nextPage ? fetch.lastPage : null;
+                _this2.pagination = {
+                  count: fetch.pagination.count,
+                  page: fetch.pagination.page,
+                  first: fetch.pagination.firstPage,
+                  previous: fetch.pagination.previousPage,
+                  next: fetch.pagination.nextPage,
+                  last: fetch.pagination.nextPage
+                };
                 console.log(_this2.pagination); // JK: Set Items
 
                 _this2.items = fetch.contents;
                 console.log(_this2.items);
 
-              case 16:
+              case 11:
               case "end":
                 return _context.stop();
             }
@@ -2771,14 +2775,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // Axios Fetch to given URL
                 _this5.loading = true;
                 _context4.next = 3;
-                return _this5.$axios.$get(url)["catch"](function (error) {
+                return axios.get(url)["catch"](function (error) {
                   console.log(error);
                 });
 
               case 3:
                 fetch = _context4.sent;
                 _this5.loading = false;
-                return _context4.abrupt("return", fetch);
+                return _context4.abrupt("return", fetch ? fetch.data : {});
 
               case 6:
               case "end":
@@ -4993,15 +4997,15 @@ var render = function() {
                                         staticClass: "mr-5",
                                         attrs: { label: "Abklatsche" },
                                         model: {
-                                          value: _vm.query["has-imprints"],
+                                          value: _vm.query.has_imprints,
                                           callback: function($$v) {
                                             _vm.$set(
                                               _vm.query,
-                                              "has-imprints",
+                                              "has_imprints",
                                               $$v
                                             )
                                           },
-                                          expression: "query['has-imprints']"
+                                          expression: "query.has_imprints"
                                         }
                                       }),
                                       _vm._v(" "),
@@ -5010,15 +5014,15 @@ var render = function() {
                                         staticClass: "mr-5",
                                         attrs: { label: "3D-Abklatsche" },
                                         model: {
-                                          value: _vm.query["has-imprints-3d"],
+                                          value: _vm.query.has_imprints_3d,
                                           callback: function($$v) {
                                             _vm.$set(
                                               _vm.query,
-                                              "has-imprints-3d",
+                                              "has_imprints_3d",
                                               $$v
                                             )
                                           },
-                                          expression: "query['has-imprints-3d']"
+                                          expression: "query.has_imprints_3d"
                                         }
                                       }),
                                       _vm._v(" "),
@@ -5027,15 +5031,15 @@ var render = function() {
                                         staticClass: "mr-5",
                                         attrs: { label: "Fotos" },
                                         model: {
-                                          value: _vm.query["has-fotos"],
+                                          value: _vm.query.has_fotos,
                                           callback: function($$v) {
                                             _vm.$set(
                                               _vm.query,
-                                              "has-fotos",
+                                              "has_fotos",
                                               $$v
                                             )
                                           },
-                                          expression: "query['has-fotos']"
+                                          expression: "query.has_fotos"
                                         }
                                       }),
                                       _vm._v(" "),
@@ -5043,15 +5047,15 @@ var render = function() {
                                         key: "E" + _vm.queryRefresh,
                                         attrs: { label: "Scheden" },
                                         model: {
-                                          value: _vm.query["has-scheden"],
+                                          value: _vm.query.has_scheden,
                                           callback: function($$v) {
                                             _vm.$set(
                                               _vm.query,
-                                              "has-scheden",
+                                              "has_scheden",
                                               $$v
                                             )
                                           },
-                                          expression: "query['has-scheden']"
+                                          expression: "query.has_scheden"
                                         }
                                       })
                                     ],
@@ -5526,8 +5530,7 @@ var render = function() {
                                                             id: "edcs",
                                                             method: "post",
                                                             action:
-                                                              _vm.$store.state
-                                                                .settings.edcs,
+                                                              "http://db.edcs.eu/epigr/epi_ergebnis.php",
                                                             target: "_blank"
                                                           }
                                                         },
@@ -67590,9 +67593,9 @@ window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")
 vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_3___default.a); // this is the progress bar settings
 
 vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_6___default.a, {
-  color: '#3f51b5',
+  color: '#b51212',
   failedColor: '#b71c1c',
-  thickness: '5px',
+  thickness: '2px',
   transition: {
     speed: '0.2s',
     opacity: '0.6s',

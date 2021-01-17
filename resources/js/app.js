@@ -18,9 +18,9 @@ Vue.use(Vuetify);
 
 // this is the progress bar settings
 Vue.use(VueProgressBar,{
-    color: '#3f51b5',
+    color: '#b51212',
     failedColor: '#b71c1c',
-    thickness: '5px',
+    thickness: '2px',
     transition: {
         speed: '0.2s',
         opacity: '0.6s',

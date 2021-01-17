@@ -48,25 +48,25 @@
 
                 <v-col cols="12" sm="7" xl="6" class="d-md-flex flex-wrap justify-space-between pt-0">
                   <v-checkbox
-                    v-model="query['has-imprints']"
+                    v-model="query.has_imprints"
                     :key="'B' + queryRefresh"
                     label="Abklatsche"
                     class="mr-5"
                   ></v-checkbox>
                   <v-checkbox
-                    v-model="query['has-imprints-3d']"
+                    v-model="query.has_imprints_3d"
                     :key="'C' + queryRefresh"
                     label="3D-Abklatsche"
                     class="mr-5"
                   ></v-checkbox>
                   <v-checkbox
-                    v-model="query['has-fotos']"
+                    v-model="query.has_fotos"
                     :key="'D' + queryRefresh"
                     label="Fotos"
                     class="mr-5"
                   ></v-checkbox>
                   <v-checkbox
-                    v-model="query['has-scheden']"
+                    v-model="query.has_scheden"
                     :key="'E' + queryRefresh"
                     label="Scheden"
                   ></v-checkbox>
@@ -262,7 +262,7 @@
                         v-if="d.edcs"
                         id="edcs"
                         method="post"
-                        :action="$store.state.settings.edcs"
+                        action="http://db.edcs.eu/epigr/epi_ergebnis.php"
                         target="_blank"
                       >
                         <input type="hidden" name="p_edcs_id" :value="d.edcs" />
@@ -538,20 +538,20 @@ export default {
       items: [],
       itemsDetails: {},
       checkboxes: [
-        { value: 'has-imprints', label: 'Abklatsche' },
-        { value: 'has-imprints-3d', label: '3D-Abklatsche' },
-        { value: 'has-fotos', label: 'Fotos' },
-        { value: 'has-scheden', label: 'Scheden' }
+        { value: 'has_imprints', label: 'Abklatsche' },
+        { value: 'has_imprints_3d', label: '3D-Abklatsche' },
+        { value: 'has_fotos', label: 'Fotos' },
+        { value: 'has_scheden', label: 'Scheden' }
       ],
       query: {},
       queryKeys: [
         'id',
         'name',
         'KO',
-        'has-imprints',
-        'has-imprints-3d',
-        'has-fotos',
-        'has-scheden'
+        'has_imprints',
+        'has_imprints_3d',
+        'has_fotos',
+        'has_scheden'
       ],
       abbreviations: {
         active: false,
@@ -662,23 +662,24 @@ export default {
       this.itemsExpanded = []
       this.items = []
       this.itemsDetails = {}
-      const fetch = await this.FetchData(
-        this.BuildFetchURL()
-      )
+      const fetch = await this.FetchData(this.BuildFetchURL())
       // Check if result
-      if (fetch.contents[0]) {
+      if (fetch?.contents?.[0]) {
         // this.filterExpanded = false
-      } else {
+      }
+      else {
         this.no_result = 'Die Suche erbrachte kein Ergebnis.'
         setTimeout(() => { this.no_result = '&ensp;' }, 4000)
       }
       // JK: Set Pagination
-      this.pagination.count = fetch.count
-      this.pagination.page = fetch.page
-      this.pagination.first = fetch.previousPage ? fetch.firstPage : null
-      this.pagination.previous = fetch.previousPage
-      this.pagination.next = fetch.nextPage
-      this.pagination.last = fetch.nextPage ? fetch.lastPage : null
+      this.pagination = {
+        count: fetch.pagination.count,
+        page: fetch.pagination.page,
+        first: fetch.pagination.firstPage,
+        previous: fetch.pagination.previousPage,
+        next: fetch.pagination.nextPage,
+        last: fetch.pagination.nextPage,
+      }
       console.log(this.pagination)
       // JK: Set Items
       this.items = fetch.contents
@@ -733,9 +734,9 @@ export default {
 
     async FetchData (url) { // Axios Fetch to given URL
       this.loading = true
-      const fetch = await this.$axios.$get(url).catch((error) => { console.log(error) })
+      const fetch = await axios.get(url).catch((error) => { console.log(error) })
       this.loading = false
-      return fetch
+      return fetch ? fetch.data : {}
     },
 
     async ToggleItem (id, url) { // Toggle Details in Result List
