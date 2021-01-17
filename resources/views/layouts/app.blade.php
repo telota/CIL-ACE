@@ -147,22 +147,10 @@
 
 
                     <!-- Footer -->
-                    <v-footer app fixed padless class="pr-5 pl-5 pt-3 pb-3">
-                        <v-row>
-
-                            <v-col cols="12" sm="12" md="4" lg="4" :class="'pa-0 ma-0'+($vuetify.breakpoint.mdAndUp ? '' : ' text-center')">
-                            </v-col>
-
-                            <v-col cols="12" sm="12" md="4" lg="4" class="pa-0 ma-0 text-center">
-                                <button @click="about = true">
-                                    <span class="font-weight-thin">© 2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('') !!}&ensp;TELOTA&nbsp;-&nbsp;IT/DH</span>
-                                </button>
-                            </v-col>
-
-                            <v-col cols="12" sm="12" md="4" lg="4" :class="'pa-0 ma-0 '+($vuetify.breakpoint.mdAndUp ? 'text-right' : 'text-center')">
-                            </v-col>
-
-                        </v-row>
+                    <v-footer app fixed class="primary d-flex justify-center">
+                        <v-card flat class="white--text transparent" @click="about = true">
+                            <span class="font-weight-thin">2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('') !!}&ensp;TELOTA&nbsp;-&nbsp;IT/DH</span>
+                        </v-card>
                     </v-footer>
 
                 </v-app>
@@ -196,7 +184,7 @@
                                     Berlin-Brandenburg Academy of Sciences and Humanities<br />
                                     Jägerstraße 22/23<br />
                                     10117 Berlin<br /><br />
-                                    © 2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('')!!}
+                                    2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('')!!}
                                 </p>
                             </div>
                             <div class="mb-n3 d-flex justify-center"><v-btn text @click="about=false">Close</v-btn></div>
