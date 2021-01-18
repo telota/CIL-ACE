@@ -516,9 +516,6 @@ export default {
   },
 
   methods: {
-    label (key) {
-      return this.labels[key] ? this.labels[key] : key
-    },
     OpenNewBrowserTab (url) { // Handler for Links to external resources
       window.open(url, '_blank')
     },
@@ -650,11 +647,11 @@ export default {
         if (this.copyrights[entity]) {
           left.push('<a href="' + this.copyrights[entity].link + '" target="_blank">' + this.copyrights[entity].string + '</a>')
         } else {
-          left.push(this.label('copy_right_ask'))
+          left.push(this.$root.label('copy_right_ask'))
         }
         // Information Link on right side
         if (Object.keys(this.info).includes(entity)) {
-          right.push('<a href="' + this.info[entity] + '" target="_blank">' + this.label('further_information') + '</a>')
+          right.push('<a href="' + this.info[entity] + '" target="_blank">' + this.$root.label('further_information') + '</a>')
         }
         // Image Link
         const link = this.digilib_scaler + (entity === 'imprints' ? data.fotos?.[0]?.link : data.link) + '&dw=' + this.img_size.width + '&dh=' + this.img_size.height
