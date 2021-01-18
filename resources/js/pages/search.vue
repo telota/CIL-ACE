@@ -546,7 +546,7 @@ export default {
         first: fetch.pagination.firstPage,
         previous: fetch.pagination.previousPage,
         next: fetch.pagination.nextPage,
-        last: fetch.pagination.nextPage,
+        last: fetch.pagination.lastPage,
       }
       console.log(this.pagination)
       // JK: Set Items
@@ -597,7 +597,7 @@ export default {
         first: fetch.pagination.firstPage,
         previous: fetch.pagination.previousPage,
         next: fetch.pagination.nextPage,
-        last: fetch.pagination.nextPage,
+        last: fetch.pagination.lastPage,
       }
       console.log(this.pagination)
       // Set Result Items

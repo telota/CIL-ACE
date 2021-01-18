@@ -102,22 +102,21 @@
                             </v-col>
                         </v-row>
                         <!-- Language -->
-                        <div class="d-flex justify-end align-center" style="position: absolute; right: 0; z-index: 3">
-                            <v-card
-                                tile
-                                flat
+                        <div class="d-flex justify-end align-center" style="position: absolute; right: 5px; z-index: 3">
+                            <v-btn
+                                icon
                                 class="title pa-2"
                                 v-text="$root.language === 'de' ? 'EN' : 'DE'"
                                 @click="$root.language = $root.language === 'de' ? 'en' : 'de'"
-                            ></v-card>
+                            ></v-btn>
                         </div>
                     </v-app-bar>
 
-                    <!-- Beta -->
-                    <div class="title text-center red--text" style="width: 100%; z-index:20; position: absolute; top: 68px">
-                        <span>Diese Seite befindet sich noch im Aufbau. Bitte nutzen Sie die</span>
-                        <a href="http://cil-old.bbaw.de/dateien/datenbank.php">alten Seite.</a>
-                    </div>
+<!-- Beta -->
+<div class="title text-center red--text" style="width: 100%; z-index:20; position: absolute; top: 68px">
+    <span>Diese Seite befindet sich noch im Aufbau. Bitte nutzen Sie die</span>
+    <a href="http://cil-old.bbaw.de/dateien/datenbank.php">alten Seite.</a>
+</div>
 
 
                     <!-- Routed Component -->

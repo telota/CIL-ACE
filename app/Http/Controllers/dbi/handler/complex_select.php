@@ -93,7 +93,7 @@ class complex_select {
                     $order_by = new $order_by();
                     $allowed_order_by = $order_by -> instructions();
 
-                    $ordered = $this -> orderBy($base_id, $allowed_order_by, $input, $query);
+                    $ordered = $this -> orderBy($order_by, $base_id, $allowed_order_by, $input, $query);
                     $pagination['sort_by'] = $ordered['sort_by'];
                     $query = $ordered['query'];
                 }
@@ -114,62 +114,6 @@ class complex_select {
                     $pagination['sort_by'] = $explode[0].' '.(empty($explode[1]) ? 'ASC' : (strtolower($explode[1]) === 'desc' ? 'DESC' : 'ASC'));
                 }
             }
-
-            // Order by
-            /*if (empty($input['sort_by'])) {
-                $pagination['sort_by'] = 'id ASC';
-                $prequery -> orderBy($base_id, 'ASC');
-            }
-            else {
-                $order_by = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_order_by';
-                $order_by = new $order_by();
-                $allowed_order_by = $order_by -> instructions();
-
-                $ordered = $this -> orderBy($base_id, $allowed_order_by, $input, $prequery);
-                $pagination['sort_by'] = $ordered['sort_by'];
-                $prequery = $ordered['query'];
-            }
-
-            // Execute Prequery
-            $dbi = $prequery -> get();
-            $dbi = json_decode($dbi, TRUE);
-
-            // count records
-            $count = $pagination['count'] = empty($dbi[0]) ? 0 : count($dbi);
-
-            // Pagination
-            $paginator = new pagination;
-            $pagination = array_merge($pagination, $paginator -> process($count, $input));
-            $offset = $pagination['offset'];
-            $limit = $pagination['limit'];
-
-            // Get selection of IDs
-            for ($i = $offset; $i < ($offset + $limit); $i++) {
-                if ($i >= $count) { break; }
-                $selection[] = $dbi[$i]['id'];
-            }
-
-            // Mainquery -------------------------------------------------------------------
-            if (!empty($selection)) {
-                $query = DB::table($base_name.' AS '.$base_alias);
-
-                // Select
-                $select = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_select';
-                $select = new $select();
-                $query -> select($this -> createSelect($select -> instructions($user)));
-
-                // Join
-                $join = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_join';
-                $join = new $join();
-                $query = $join -> instructions($query);
-
-                $dbi = $query
-                    -> whereIntegerInRaw($base_id, $selection)
-                    -> orderByRaw('FIELD('.$base_id.', '.implode(',', $selection).')')
-                    -> get();
-
-                $dbi = $this -> postProcessing($dbi);
-            }*/
 
             // Return -------------------------------------------------------------------
             return [
@@ -332,7 +276,7 @@ class complex_select {
     }
 
 
-    public function orderBy ($base_id, $allowed_order_by, $input, $prequery) {
+    public function orderBy ($order_class, $base_id, $allowed_order_by, $input, $query) {
         // Explode sort by to extract key and operator
         $sort_explode   = explode('.', $input['sort_by']);
         $exploded_op    = isset($sort_explode[1]) ? strtoupper(array_pop($sort_explode)) : 'ASC';
@@ -351,19 +295,24 @@ class complex_select {
                 $ob_col = $allowed_order_by[$ob_key];
             }
 
-            $prequery -> orderByRaw(
-                $ob_col.' IS NULL, '.   // NULLs last
-                $ob_col.' '.$ob_op      // order by given key and operator
-            );
+            if (!method_exists($order_class,'process')) {
+                $query -> orderByRaw(
+                    $ob_col.' IS NULL, '.   // NULLs last
+                    $ob_col.' '.$ob_op      // order by given key and operator
+                );
+            }
+            else {
+                $query = $order_class -> process($ob_key, $ob_col, $ob_op, $query, $input);
+            }
         }
         else {
-            $prequery -> orderBy($base_id, 'ASC');
+            $query -> orderBy($base_id, 'ASC');
             $sort_by = 'id ASC';
         }
 
         return [
             'sort_by' => $sort_by,
-            'query' => $prequery
+            'query' => $query
         ];
     }
 
