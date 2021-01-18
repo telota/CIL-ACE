@@ -20,4 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get      ('/documentation/{entity}/{resource?}', 'apiController@documentation');
 
+Route::match    (['get', 'post'], '/',    function () {
+    return '404: Please specifiy the resource you would like to receive.';
+});
 Route::match    (['get', 'post'], '/{entity}/{id?}',    'apiController@select');

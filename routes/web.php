@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::match    (['get', 'post'], '/',    function () {
+    return '404: Please specifiy the page you would like to visit.';
+});
 Route::get ('/ace', 'appController@initiate');
 
 /*Route::get('/', function () {

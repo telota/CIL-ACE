@@ -15,7 +15,7 @@
 
         <!-- Styles -->
         {{--<link rel="shortcut icon" href="favicon.ico">--}}
-        <link rel="icon" type="image/png" href="favicon" sizes="96x96">
+        {{--<link rel="icon" type="image/png" href="/favicon" sizes="96x96">--}}
         {{--<link rel="icon" type="image/png" href="favicon.png" sizes="96x96">--}}
         {{--<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">--}}
         <link href="{{ asset('css/extend.css') }}" rel="stylesheet">
@@ -112,6 +112,12 @@
                             ></v-card>
                         </div>
                     </v-app-bar>
+
+                    <!-- Beta -->
+                    <div class="title text-center red--text" style="width: 100%; z-index:20; position: absolute; top: 68px">
+                        <span>Diese Seite befindet sich noch im Aufbau. Bitte nutzen Sie die</span>
+                        <a href="http://cil-old.bbaw.de/dateien/datenbank.php">alten Seite.</a>
+                    </div>
 
 
                     <!-- Routed Component -->
