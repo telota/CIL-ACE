@@ -6,164 +6,126 @@
       <v-col cols="12" sm="10">
 
         <v-card tile raised class="mt-4">
-          <!-- Header Bar  ----------------------------------------------------- ----------------------------------------------------- -->
-          <v-card
-            tile
-            class="bar_prim"
-            :flat="filterExpanded"
-            :disabled="!items [0]"
-            @click="filterExpanded = !filterExpanded"
-          >
-            <v-card-text class="d-flex component-wrap">
-              <div style="width: 20%">
-                &ensp;
-              </div>
-              <div class="headline d-flex justify-center black--text" style="width: 60%; font-variant:small-caps;">
-                Archivum Corporis Electronicum
-              </div>
-              <div style="width: 20%" class="d-flex justify-end">
-                <v-icon v-text="filterExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></v-icon>
-              </div>
-            </v-card-text>
-          </v-card>
+            <!-- Header -->
+            <div
+                v-if="filterExpanded"
+                class="d-flex justify-space-between align-end"
+                style="width: 100%"
+            >
+                <div
+                    class="caption pl-4"
+                    style="cursor: pointer"
+                    v-html="$root.label('abbreviations_note')"
+                    @click="abbreviations.active = true"
+                ></div>
+                <v-btn
+                    icon
+                    class="ml-1 mr-1 mt-1"
+                    :disabled="!items[0]"
+                    @click="filterExpanded = !filterExpanded"
+                >
+                    <v-icon v-text="filterExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></v-icon>
+                </v-btn>
+            </div>
 
-          <!-- Filter Container  ----------------------------------------------------- ----------------------------------------------------- -->
-          <v-expand-transition>
-            <v-card-text v-if="filterExpanded">
-              <div class="caption">
-                Für die Suche nach anderen Editionen siehe die verbindlichen
-                <b style="cursor: pointer" @click="abbreviations.active = true" v-text="'Abkürzungen'"></b>.
-              </div>
-              <v-row>
-                <v-col cols="12" sm="5" xl="6" class="pt-0">
-                  <v-text-field
-                    id="search_name"
-                    v-model="query.name"
-                    :key="'A' + queryRefresh"
-                    label="Inschrift"
-                    clearable
-                    v-on:keyup.enter="RunSearch()"
-                  ></v-text-field>
-                </v-col>
+            <!-- Filter Container  ----------------------------------------------------- ----------------------------------------------------- -->
+            <v-expand-transition>
+                <v-card-text v-if="filterExpanded">
+                <v-row>
+                    <!-- Name -->
+                    <v-col cols=12 lg=6 class="pt-0">
+                    <v-text-field
+                        id="search_name"
+                        v-model="query.name"
+                        :key="'A' + queryRefresh"
+                        :label="$root.label('inscription')"
+                        clearable
+                        v-on:keyup.enter="RunSearch()"
+                    ></v-text-field>
+                    </v-col>
+                    <!-- Resources -->
+                    <v-col cols=12 lg=6 :class="$vuetify.breakpoint.lgAndUp ? 'pt-8' : 'pt-0'">
+                        <v-row class="pt-0">
+                            <v-col
+                                v-for="record in ['has_imprints', 'has_imprints_3d', 'has_fotos', 'has_scheden']"
+                                :key="record + queryRefresh"
+                                cols=6
+                                xl=3
+                                class="pt-0 ma-0"
+                            >
+                                <v-checkbox
+                                    v-model="query[record]"
+                                    :label="$root.label(record.slice(4))"
+                                    class="ma-0 pa-0"
+                                ></v-checkbox>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
 
-                <v-col cols="12" sm="7" xl="6" class="d-md-flex flex-wrap justify-space-between pt-0">
-                  <v-checkbox
-                    v-model="query.has_imprints"
-                    :key="'B' + queryRefresh"
-                    label="Abklatsche"
-                    class="mr-5"
-                  ></v-checkbox>
-                  <v-checkbox
-                    v-model="query.has_imprints_3d"
-                    :key="'C' + queryRefresh"
-                    label="3D-Abklatsche"
-                    class="mr-5"
-                  ></v-checkbox>
-                  <v-checkbox
-                    v-model="query.has_fotos"
-                    :key="'D' + queryRefresh"
-                    label="Fotos"
-                    class="mr-5"
-                  ></v-checkbox>
-                  <v-checkbox
-                    v-model="query.has_scheden"
-                    :key="'E' + queryRefresh"
-                    label="Scheden"
-                  ></v-checkbox>
-                </v-col>
-              </v-row>
+                <!-- Search Button ----------------------------------------------------- -->
+                <v-row justify="center" align="center">
+                    <v-col cols="12" sm="4" class="mb-n4 mt-n2">
+                    <v-btn large tile block color="primary" @click="RunSearch()">
+                        <span
+                            class="title"
+                            v-text="$root.label('search')"
+                        ></span>
+                    </v-btn>
+                    <div class="pt-2 mb-4 d-flex justify-center">
+                        <v-btn
+                            text
+                            small
+                            v-text="$root.label('search_reset')"
+                            @click="ResetFilters(true)"
+                        ></v-btn>
+                    </div>
+                    </v-col>
+                </v-row>
 
-              <!-- Search Button ----------------------------------------------------- -->
-              <v-row justify="center" align="center">
-                <v-col cols="12" sm="4" class="mb-n4 mt-n2">
-                  <v-btn large tile block color="primary" @click="RunSearch()">
-                    <span class="title">Suche</span>
-                  </v-btn>
-                  <div class="pt-2 d-flex justify-center">
-                    <v-btn text small @click="ResetFilters(true)">Suche zurücksetzen</v-btn>
-                  </div>
-                </v-col>
-              </v-row>
-
-            </v-card-text>
-          </v-expand-transition>
-
-          <!-- Result Count ----------------------------------------------------- -->
-          <v-card
-            tile
-            flat
-            :loading="loading"
-            class="bar_prim"
-          >
-            <v-card-text
-              class="text-center body-1"
-              v-html="!items[0] ? (loading ? 'Ihre Anfrage wird ausgeführt ...' : no_result) : (!count_formated ? '' : (count_formated + ' Treffer'))"
-            ></v-card-text>
-          </v-card>
+                </v-card-text>
+            </v-expand-transition>
         </v-card>
+
+        <v-expand-transition>
+            <v-card v-if="searched" tile class="bar_prim mt-5" :loading="loading">
+                <!-- Result Count ----------------------------------------------------- -->
+                <div class="d-flex align-center justify-center">
+                    <v-btn
+                        v-if="!filterExpanded"
+                        icon
+                        right
+                        class="mr-l"
+                        :disabled="!items[0]"
+                        @click="filterExpanded = !filterExpanded"
+                    >
+                        <v-icon v-text="filterExpanded ? 'keyboard_arrow_up' : 'search'"></v-icon>
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <div
+                        class="body-1 pb-2 pt-4"
+                        v-html="!items[0] ? (loading ? $root.label('processing') : no_result) : (!count_formated ? '' : (count_formated + ' ' + $root.label('records')))"
+                    ></div>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        v-if="!filterExpanded"
+                        icon
+                        right
+                        class="mr-1"
+                        :disabled="!items[0]"
+                        @click="filterExpanded = !filterExpanded"
+                    >
+                        <v-icon v-text="filterExpanded ? 'keyboard_arrow_up' : 'search'"></v-icon>
+                    </v-btn>
+                </div>
+                <!-- Pagination -->
+                <pagination :pagination="pagination" v-on:navigate="(emit) => { Navigate(emit) }"></pagination>
+            </v-card>
+        </v-expand-transition>
 
         <!-- Result Container ----------------------------------------------------- ----------------------------------------------------- -->
         <v-expand-transition>
           <div v-if="count_formated != null" class="mt-5">
-
-            <!-- Pagination -->
-            <v-card
-              tile
-              class="bar_prim mb-5 d-flex component-wrap"
-            >
-              <v-spacer></v-spacer>
-              <!-- First -->
-              <v-btn
-                :tile="pagination.previous ? true : false"
-                :text="pagination.previous ? false : true"
-                depressed
-                :disabled="pagination.previous ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.first)"
-              >
-                <v-icon v-text="'first_page'"></v-icon>
-              </v-btn>
-              <!-- Previous -->
-              <v-btn
-                :tile="pagination.previous ? true : false"
-                :text="pagination.previous ? false : true"
-                depressed
-                :disabled="pagination.previous ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.previous)"
-              >
-                <v-icon v-text="'navigate_before'"></v-icon>
-              </v-btn>
-              <!-- Page -->
-              <v-btn
-                text
-                disabled
-                v-text="pagination.page.current + ' / ' + pagination.page.total"
-              ></v-btn>
-              <!-- Next -->
-              <v-btn
-                :tile="pagination.next ? true : false"
-                :text="pagination.next ? false : true"
-                depressed
-                :disabled="pagination.next ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.next)"
-              >
-                <v-icon v-text="'navigate_next'"></v-icon>
-              </v-btn>
-              <!-- Last -->
-              <v-btn
-                :tile="pagination.next ? true : false"
-                :text="pagination.next ? false : true"
-                depressed
-                :disabled="pagination.next ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.last)"
-              >
-                <v-icon v-text="'last_page'"></v-icon>
-              </v-btn>
-              <v-spacer></v-spacer>
-            </v-card>
 
             <!-- Results -->
             <v-card
@@ -171,92 +133,58 @@
               :key="item.id"
               tile
             >
-              <!-- Item Header -->
-              <v-card
-                @click="ToggleItem(item.id, item.self)"
-                tile
-                flat
-              >
-                <v-card-title>
-                  <div class="d-flex mb-n2" style="width: 100%">
-                    <div v-html="item.name" class="ml-auto pt-1 font-weight-bold body-1" style="width: 100%"></div>
-                    <div class="pl-5 mr-auto">
-                      <v-icon v-text="itemsExpanded.includes(item.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></v-icon>
-                    </div>
-                  </div>
-                </v-card-title>
-              </v-card>
-              <!-- Item Body -->
               <v-expand-transition>
+                <!-- Item Header -->
+                <v-card
+                    v-if="!itemsExpanded.includes(item.id)"
+                    tile
+                    flat
+                    @click="ToggleItem(item.id, item.self)"
+                >
+                    <v-card-title >
+                        <div class="d-flex mb-n2" style="width: 100%">
+                            <div v-html="item.name" class="ml-auto pt-1 font-weight-bold body-1" style="width: 100%"></div>
+                            <div class="pl-5 mr-auto">
+                            <v-icon v-text="itemsExpanded.includes(item.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></v-icon>
+                            </div>
+                        </div>
+                    </v-card-title>
+                </v-card>
+                <!-- Item Body -->
                 <div
                   v-if="itemsExpanded.includes(item.id)"
                   style="border-top: 2px solid #b51212; background-color: #fefefe"
                 >
-                  <v-card-text>
-                    <div v-for="d in [itemsDetails[item.id]]" :key="d.id">
-                      <!-- <div class="d-flex justify-space-between">
-                        <div class="title mt-n2 mb-1" v-html="label('references_main')"></div>
-                        <!- Clauss
-                        <form
-                          v-if="d.edcs"
-                          id="edcs"
-                          method="post"
-                          :action="$store.state.settings.edcs"
-                          target="_blank"
-                        >
-                          <input type="hidden" name="p_edcs_id" :value="d.edcs" />
-                          <input type="hidden" name="s_sprache" value="de" />
-                          <input type="hidden" name="r_auswahl" value="und" />
-                          <input type="hidden" name="r_sortierung" value="Provinz" />
-                          <input type="hidden" name="cmdsubmit" value="go" />
-                          <span v-text="'Text und weitere Informationen bei'"></span>
-                          <input type="submit" value="EDCS" class="font-weight-bold"/>
-                        </form>
-                      </div>
-                      <!- References
-                      <div class="pl-3">
-                        <table>
-                          <tr
-                            v-for="(ref, r) in d.name_object"
-                            :key="r"
-                          >
-                            <td
-                              class="font-weight-bold"
-                              v-html="ref.ref_short"
-                            ></td>
-                            <td
-                              class="pl-3"
-                              v-html="ref.ref_full.replace('u00b2', '²')"
-                            ></td>
-                          </tr>
-                      </table>
-                      </div>-->
-                      <!-- Header -->
-                      <div class="body-1 pb-2">
-                        <div class="d-flex flex-wrap">
-                          <div
-                            v-for="(ref, r) in d.name_object"
-                            :key="r"
-                            class="d-flex flex-nowrap"
-                          >
-                            <div v-if="ref.delimiter" v-html="'&nbsp;' + ref.delimiter + '&nbsp;'"></div>
-                            <div v-text="ref.clamped.start"></div>
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{on}">
-                                <v-hover v-slot="{ hover }">
-                                  <div
-                                    v-on="on"
-                                    v-html="ref.ref_short"
-                                    :class="hover ? 'accent--text' : ''"
-                                  ></div>
-                                </v-hover>
-                              </template>
-                              <span v-html="ref.ref_full.replace('u00b2', '²')"></span>
-                            </v-tooltip>
-                            <div v-text="ref.clamped.end"></div>
-                          </div>
+                    <v-card-text>
+                        <div v-for="d in [itemsDetails[item.id]]" :key="d.id">
+                        <!-- Header -->
+                        <div class="d-flex justify-space-between align-start">
+                            <div class="body-1 font-weight-bold pb-2">
+                                <span
+                                    v-for="(ref, r) in d.name_object"
+                                    :key="r"
+                                ><!--
+                                    --><span v-if="ref.delimiter" v-html="'&nbsp;' + ref.delimiter + '&nbsp;'"></span><!--
+                                    --><span v-text="ref.clamped.start"></span><!--
+                                    --><v-tooltip bottom><!--
+                                        --><template v-slot:activator="{on}"><!--
+                                            --><v-hover v-slot="{ hover }"><!--
+                                                --><span
+                                                    v-on="on"
+                                                    v-html="ref.ref_short"
+                                                    :class="hover ? 'accent--text' : ''"
+                                                ></span><!--
+                                            --></v-hover><!--
+                                        --></template><!--
+                                        --><span v-html="ref.ref_full.replace('u00b2', '²')"></span><!--
+                                    --></v-tooltip><!--
+                                    --><span v-text="ref.clamped.end"></span><!--
+                                --></span>
+                            </div>
+                            <v-btn icon class="mr-n1 mt-n1" @click="ToggleItem(item.id, item.self)">
+                                <v-icon v-text="itemsExpanded.includes(item.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></v-icon>
+                            </v-btn>
                         </div>
-                      </div>
                       <!-- Clauss -->
                       <form
                         v-if="d.edcs"
@@ -270,7 +198,7 @@
                         <input type="hidden" name="r_auswahl" value="und" />
                         <input type="hidden" name="r_sortierung" value="Provinz" />
                         <input type="hidden" name="cmdsubmit" value="go" />
-                        <span v-text="'Text und weitere Informationen bei'"></span>
+                        <span v-text="$root.label('edcs_note')"></span>
                         <input type="submit" value="EDCS" class="font-weight-bold"/>
                       </form>
                       <!-- <div>Zitationslink: {{ CiteLink(d.concordance) }} <a :href="CiteLink(d.concordance)" style="text-decoration: none;">&#x1F5D7;</a></div> -->
@@ -278,8 +206,8 @@
                       <template v-for="record in ['imprints', 'fotos', 'scheden']">
                         <div :key="record" v-if="d[record]">
                           <!-- Header -->
-                          <div class="pt-3 title d-flex align-start">
-                            <div v-text="label(record)"></div>
+                          <div class="pt-3 pb-1 title d-flex align-start">
+                            <div v-text="$root.label(record)"></div>
                             <a :href="info[record]" target="_blank" v-html="'&nbsp;&#9432;'"></a>
                           </div>
                           <!-- Body -->
@@ -314,8 +242,8 @@
                                   aspect-ratio="1"
                                   class="d-flex align-center text-center caption text-uppercase"
                                 >
-                                  <div v-if="r.link" v-text="label('only_3d')"></div>
-                                  <div v-else v-text="label('no_digital')"></div>
+                                  <div v-if="r.link" v-text="$root.label('only_3d')"></div>
+                                  <div v-else v-text="$root.label('no_digital')"></div>
                                 </v-responsive>
                                 <!-- Image Tile -->
                                 <v-card
@@ -335,20 +263,12 @@
                                   class="caption pa-1 mb-n1 text-center"
                                   v-text="r.fmid"
                                 ></div>
-                                <!--<v-card
-                                  v-if="im.link"
-                                  tile
-                                  flat
-                                  class="caption transparent text-center"
-                                  v-text="'3D-Scan verfügbar'"
-                                  @click="OpenNewBrowserTab(im.link)"
-                                ></v-card>-->
                               </v-card>
                             </v-col>
                           </v-row>
                           <!-- 3D Credits -->
                           <div v-if="record === 'imprints' ? (d[record].find((r) => r)) : false" class="caption mt-1">
-                            <a href="https://www.einsteinfoundation.de/" target="_blank" v-text="label('credit_3d')"></a>
+                            <a href="https://www.einsteinfoundation.de/" target="_blank" v-text="$root.label('credit_3d')"></a>
                           </div>
                         </div>
                       </template>
@@ -363,58 +283,7 @@
               tile
               class="bar_prim mb-5 mt-5 d-flex component-wrap"
             >
-              <v-spacer></v-spacer>
-              <!-- First -->
-              <v-btn
-                :tile="pagination.previous ? true : false"
-                :text="pagination.previous ? false : true"
-                depressed
-                :disabled="pagination.previous ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.first)"
-              >
-                <v-icon v-text="'first_page'"></v-icon>
-              </v-btn>
-              <!-- Previous -->
-              <v-btn
-                :tile="pagination.previous ? true : false"
-                :text="pagination.previous ? false : true"
-                depressed
-                :disabled="pagination.previous ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.previous)"
-              >
-                <v-icon v-text="'navigate_before'"></v-icon>
-              </v-btn>
-              <!-- Page -->
-              <v-btn
-                text
-                disabled
-                v-text="pagination.page.current + ' / ' + pagination.page.total"
-              ></v-btn>
-              <!-- Next -->
-              <v-btn
-                :tile="pagination.next ? true : false"
-                :text="pagination.next ? false : true"
-                depressed
-                :disabled="pagination.next ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.next)"
-              >
-                <v-icon v-text="'navigate_next'"></v-icon>
-              </v-btn>
-              <!-- Last -->
-              <v-btn
-                :tile="pagination.next ? true : false"
-                :text="pagination.next ? false : true"
-                depressed
-                :disabled="pagination.next ? false : true"
-                class="bar_prim"
-                @click="Navigate(pagination.last)"
-              >
-                <v-icon v-text="'last_page'"></v-icon>
-              </v-btn>
-              <v-spacer></v-spacer>
+                <pagination :pagination="pagination" v-on:navigate="(emit) => { Navigate(emit) }"></pagination>
             </v-card>
 
           </div>
@@ -432,18 +301,18 @@
       <v-card tile>
         <!-- Header -->
         <div class="d-flex align-center justify-space-between">
-          <div class="font-weight-bold caption ml-3" v-html="'Abkürzungen'"></div>
+          <div class="font-weight-bold caption ml-3" v-html="$root.label('abbreviations')"></div>
           <v-btn text depressed small @click="abbreviations.active = false">
             <v-icon small v-text="'clear'"></v-icon>
           </v-btn>
         </div>
-        <div style="border-bottom: 3px solid #b51212; background-color: #fefefe"></div>
+        <div style="border-bottom: 2px solid #b51212; background-color: #fefefe"></div>
         <v-card-title class="bar_prim">
           <!--<span class="headline">Abkürzungen</span>-->
           <v-text-field
             v-model="abbreviations.search"
             append-icon="search"
-            label="Suche"
+            :label="$root.label('search')"
             dense
             single-line
             hide-details
@@ -468,17 +337,12 @@
                     @click="query.name = a.k; abbreviations.active = false"
                   ></v-icon>
                 </template>
-                <span>Abkürzung in Suchfeld kopieren</span>
+                <span v-text="$root.label('abbreviations_copy')"></span>
               </v-tooltip>
             </div>
             <span class="caption" v-text="a.v"></span>
           </div>
         </v-card-text>
-        <!--<v-card-actions class="primary">
-          <v-spacer></v-spacer>
-          <v-btn text dark @click="abbreviations.active = false">ZURÜCK</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>-->
       </v-card>
     </v-dialog>
 
@@ -496,7 +360,7 @@
             <v-icon small v-text="'clear'"></v-icon>
           </v-btn>
         </div>
-        <div style="border-bottom: 3px solid #b51212; background-color: #fefefe"></div>
+        <div style="border-bottom: 2px solid #b51212; background-color: #fefefe"></div>
         <div class="pa-3">
           <!-- Image -->
           <v-img
@@ -519,20 +383,15 @@
   </div>
 </template>
 
+
 <script>
-// import Logo from '~/components/Logo.vue'
-// import VuetifyLogo from '~/components/VuetifyLogo.vue'
 
 export default {
-  components: {
-    // Logo,
-    // VuetifyLogo
-  },
-
   data () {
     return {
       loading: false,
       filterExpanded: true,
+      searched: false,
       no_result: '&ensp;',
       itemsExpanded: [],
       items: [],
@@ -570,9 +429,9 @@ export default {
         scheden: 'https://cil.bbaw.de/index.php?id=18'
       },
       copyrights: {
-        imprints: { string: '&copy;&nbsp;CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' },
+        imprints: { string: 'CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' },
         fotos: null,
-        scheden: { string: '&copy;&nbsp;CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' }
+        scheden: { string: 'CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' }
       },
       queryRefresh: 0,
       queryDialog: false,
@@ -589,7 +448,7 @@ export default {
         next: null,
         last: null
       },
-      //digilib_scaler: this.$store.state.settings.digilib.scaler,
+      digilib_scaler: 'https://digilib.bbaw.de/digitallibrary/servlet/Scaler?fn=silo10/CIL/',
       //digilib_viewer: this.$store.state.settings.digilib.viewer
     }
   },
@@ -598,11 +457,7 @@ export default {
     /* given_id () {
         return this.$route.params.id != undefined ? this.$route.params.id : this.prop_id;
     }, */
-    labels () {
-      return this.$root.labels
-    },
-
-    api () { // Get adres of api depending on mode (set in settings)
+    api () {
       return '/api/inscriptions'
     },
 
@@ -620,12 +475,23 @@ export default {
       } else { return null }
     },
 
-    query_ko () { // Get Concordance if given
-      return this.$route.query.KO
+    givenConcordance () { // Get Concordance if given
+        let co = null
+        if (this.$route.params.ko) {
+            co = this.$route.params.ko
+        } else if (this.$route.query.KO || this.$route.query.ko) {
+            co = this.$route.query.KO ? this.$route.query.KO : this.$route.query.ko
+        }
+        if (co) {
+            if (co.slice(0, 2).toLowerCase() !== 'ko') {
+                co = 'KO' + co.padStart(7, '0')
+            }
+        }
+        return co
     },
 
     abbreviations_items () { // Handler for Search in Abbreviation Dialog
-      const content = []
+      const content = this.$abbreviations
       // Return items
       if (this.abbreviations.search) {
         return content.filter((row) => {
@@ -639,10 +505,14 @@ export default {
     }
   },
 
+    watch: {
+        givenConcordance: function() { this.CheckConcordance() }
+    },
+
   created () {
     this.ImageDialog(null)
+    this.CheckConcordance()
     this.ResetFilters()
-    this.CheckConcordance() // Execute Query immediately if KO is given
   },
 
   methods: {
@@ -659,6 +529,7 @@ export default {
     }, */
 
     async RunSearch () { // Execute Query
+        this.searched = true
       this.itemsExpanded = []
       this.items = []
       this.itemsDetails = {}
@@ -668,7 +539,7 @@ export default {
         // this.filterExpanded = false
       }
       else {
-        this.no_result = 'Die Suche erbrachte kein Ergebnis.'
+        this.no_result = this.$root.label('no_records')
         setTimeout(() => { this.no_result = '&ensp;' }, 4000)
       }
       // JK: Set Pagination
@@ -704,13 +575,16 @@ export default {
     },
 
     async CheckConcordance () { // Method to handle concordance if given as URL Parameter
-      if (this.query_ko) {
-        this.query.KO = this.query_ko
+      if (this.givenConcordance) {
+        this.query.KO = this.givenConcordance
         await this.RunSearch()
         if (this.items.length === 1) {
           this.ToggleItem(this.items[0].id, this.items[0].self)
         }
         this.query.KO = null
+        // URL Cleanup
+        if (this.$route.name !== 'search') { this.$router.push({ name: 'search' }) }
+        if (this.$route.query.ko || this.$route.query.KO) { this.$router.replace({ query: {} }) }
       }
     },
 
@@ -720,12 +594,14 @@ export default {
       this.itemsDetails = {}
       const fetch = await this.FetchData(url)
       // Set Pagination
-      this.pagination.count = fetch.count
-      this.pagination.page = fetch.page
-      this.pagination.first = fetch.previousPage ? fetch.firstPage : null
-      this.pagination.previous = fetch.previousPage
-      this.pagination.next = fetch.nextPage
-      this.pagination.last = fetch.nextPage ? fetch.lastPage : null
+      this.pagination = {
+        count: fetch.pagination.count,
+        page: fetch.pagination.page,
+        first: fetch.pagination.firstPage,
+        previous: fetch.pagination.previousPage,
+        next: fetch.pagination.nextPage,
+        last: fetch.pagination.nextPage,
+      }
       console.log(this.pagination)
       // Set Result Items
       this.items = fetch.contents
@@ -752,7 +628,7 @@ export default {
 
     ResetFilters () { // Reset Search Form Fields to empty
       const self = this
-      if (self.query_ko) { this.$router.replace({ query: {} }) }
+      //if (this.$route.name !== 'search') { this.$router.push({ name: 'search' }) }
       this.queryKeys.forEach((key) => { self.query[key] = null })
       ++this.queryRefresh
     },
@@ -774,7 +650,7 @@ export default {
         if (this.copyrights[entity]) {
           left.push('<a href="' + this.copyrights[entity].link + '" target="_blank">' + this.copyrights[entity].string + '</a>')
         } else {
-          left.push('&copy;&nbsp;' + this.label('copy_right_ask'))
+          left.push(this.label('copy_right_ask'))
         }
         // Information Link on right side
         if (Object.keys(this.info).includes(entity)) {

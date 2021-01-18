@@ -40,7 +40,7 @@ class request_parametric_where {
                     [config('dbi.tablenames.resources').' AS r', 'r.id', '=', 'i.id']
                 ]
             ],
-            'has_imprints-3d'   => [
+            'has_imprints_3d'   => [
                 'where' => ['raw' => 'IF( r.imprints_3d > "", 1, 0)'],
                 'joins' => [
                     [config('dbi.tablenames.resources').' AS r', 'r.id', '=', 'i.id']

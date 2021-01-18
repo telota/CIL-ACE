@@ -35,6 +35,7 @@ Vue.use(VueProgressBar,{
 //Vue.component("sessioninfo",        () => import("./modules/sessioninfo.vue")); // Async Load (creates seperate File!!!)
 
 Vue.component('sessioninfo',        require('./modules/sessioninfo.vue').default);
+Vue.component('pagination',         require('./modules/pagination.vue').default);
 Vue.component('ace',                require('./pages/search.vue').default);
 
 
@@ -42,10 +43,12 @@ Vue.component('ace',                require('./pages/search.vue').default);
 //import editor_format from './global/format';
 //import handlers from './global/handlers';
 import localization from './global/localization';
+import abbreviations from './global/abbreviations';
 
 //Vue.use(editor_format);
 //Vue.use(handlers);
 Vue.use(localization);
+Vue.use(abbreviations);
 
 
 const editor = new Vue({
@@ -93,6 +96,7 @@ const editor = new Vue({
         return {
             loading: false,
             about: false,
+            consent: null,
             error: {
                 active: false
             },

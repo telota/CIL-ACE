@@ -63,76 +63,54 @@
                         fixed
                         style="border-bottom: 4px solid #b51212; background-color: #fefefe"
                     >
-                        <v-row>
-                            <v-col cols=1></v-col>
-                            <v-col cols=3>
-                                <a href="https://cil.bbaw.de" alt="CIL Homepage" target="_blank">
-                                    <v-img
-                                    src="/cil-logo.png"
-                                    max-height="45"
-                                    max-width="250"
-                                    contain
-                                    ></v-img>
-                                </a>
-                            </v-col>
-                            <v-col cols=4>
-                            </v-col>
-                            <v-col cols=3>
-                                <div class="d-flex mr-n5">
-                                    <v-spacer></v-spacer>
-                                    <a href="https://www.bbaw.de" alte="BBAW Homepage" target="_blank">
-                                        <v-img
-                                            src="/bbaw-logo.svg"
-                                            max-height="45"
-                                            max-width="150"
-                                            contain
-                                        ></v-img>
-                                    </a>
-                                </div>
-                            </v-col>
-                            <v-col cols=1>
-                                <div class="d-flex justify-end align-center">
-                                    <v-card
-                                        tile
-                                        flat
-                                        class="title pa-2"
-                                        v-text="$root.language === 'de' ? 'EN' : 'DE'"
-                                        @click="$root.language = $root.language === 'de' ? 'en' : 'de'"
-                                    ></v-card>
+                        <v-row justify="center" align="center">
+                            <v-col cols="12" sm="10">
+                                <!-- ACE -->
+                                <div
+                                    class="title text-center pt-1"
+                                    v-text="$vuetify.breakpoint.mdAndUp ? 'Archivum Corporis Electronicum' : 'ACE'"
+                                    style="position: absolute; left: 0; right: 0;"
+                                ></div>
+                                <div class="d-flex justify-space-between" style="width: 100%;">
+                                    <!-- CIL Logo -->
+                                    <div>
+                                        <a href="https://cil.bbaw.de" alt="CIL Homepage" target="_blank" style="z-index: 3">
+                                            <v-img
+                                                v-if="$vuetify.breakpoint.mdAndUp"
+                                                src="/cil-logo.png"
+                                                max-height="45"
+                                                max-width="250"
+                                                contain
+                                            ></v-img>
+                                            <div v-else class="title accent--text pt-1" v-text="'CIL'"></div>
+                                        </a>
+                                    </div>
+                                    <!-- BBAW Logo -->
+                                    <div>
+                                        <a href="https://www.bbaw.de" alte="BBAW Homepage" target="_blank">
+                                            <v-img
+                                                v-if="$vuetify.breakpoint.mdAndUp"
+                                                src="/bbaw-logo.svg"
+                                                max-height="45"
+                                                max-width="150"
+                                                contain
+                                            ></v-img>
+                                            <div v-else class="title accent--text pr-8 pt-1" v-text="'BBAW'"></div>
+                                        </a>
+                                    </div>
                                 </div>
                             </v-col>
                         </v-row>
-
-                        <!-- Left Section
-                        <advbtn icon="menu" tooltip="Togle Navigation" v-on:click="drawer.active = !drawer.active" class="ml-n3"></advbtn>
-                        <advbtn
-                            v-if="drawer.active && $vuetify.breakpoint.mdAndUp"
-                            :icon="drawer.mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-                            :tooltip="drawer.mini ? 'Expand Navigation' : 'Collapse Navigation'"
-                            :key="drawer.mini ? 'collapsed' : 'expanded'"
-                            v-on:click="drawer.mini = !drawer.mini"
-                        ></advbtn>
-                        <v-toolbar-title class="ml-3">CN <span class="font-weight-thin">Editor</span></v-toolbar-title>
-
-                        <v-spacer></v-spacer> -->
-
-                        <!-- Right Section
-                        <advbtn icon="help_outline" tooltip="Wiki" v-on:click=""></advbtn>
-                        <advbtn
-                            :icon="$vuetify.theme.dark ? 'invert_colors' : 'invert_colors_off'"
-                            :tooltip="$vuetify.theme.dark ? 'Switch to light Theme' : 'Switch to dark Theme'"
-                            :key="$vuetify.theme.dark ? 'dark' : 'light'"
-                            v-on:click="changePresets('color_theme', $vuetify.theme.dark === true ? 0 : 1)"
-                        ></advbtn>
-                        <advbtn
-                            :text="language.toUpperCase()"
-                            :tooltip="language === 'de' ? 'Switch to English' : 'Zu Deutsch wechseln'"
-                            :key="language"
-                            v-on:click="changePresets('language', language === 'de' ? 'en' : 'de')"
-                        ></advbtn>
-                        <v-divider vertical></v-divider>
-                        <advbtn icon="power_settings_new" tooltip="Logout" v-on:click="logout()" class="mr-n4"></advbtn>  -->
-
+                        <!-- Language -->
+                        <div class="d-flex justify-end align-center" style="position: absolute; right: 0; z-index: 3">
+                            <v-card
+                                tile
+                                flat
+                                class="title pa-2"
+                                v-text="$root.language === 'de' ? 'EN' : 'DE'"
+                                @click="$root.language = $root.language === 'de' ? 'en' : 'de'"
+                            ></v-card>
+                        </div>
                     </v-app-bar>
 
 
@@ -144,6 +122,31 @@
                             </div>
                         </v-fade-transition>
                     </v-main>
+
+                    <!-- Tracking Consent -->
+                    <v-card
+                        v-if="consent === null"
+                        tile
+                        style="position: fixed; bottom: 50px; right: 20px; width: 250px"
+                    >
+                        <v-card-text class="caption text-justify">
+                            <span v-text="$root.label('consent_note')"></span>
+                            <a
+                                href="https://www.bbaw.de/datenschutz"
+                                target="_blank"
+                                class="font-weight-bold"
+                                style="text-decoration: none"
+                                v-text="$root.label('consent_declaration')"
+                            ></a>.
+                        </v-card-text>
+                            <v-card-actions class="pt-0">
+                            <v-spacer></v-spacer>
+                            <v-btn small text @click="consent = false" v-text="$root.label('decline')" class="bar_prim--text"></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn small text @click="consent = true" v-text="$root.label('accept')"></v-btn>
+                            <v-spacer></v-spacer>
+                        </v-card-actions>
+                    </v-card>
 
 
                     <!-- Footer -->
@@ -163,27 +166,38 @@
                             <div class="pa-5 title d-flex justify-center">ACE App</div>
                             <div>
                                 <p>
-                                    <b>Published by:</b><br />
-                                    Berlin-Brandenburg Academy of Sciences and Humanities<br />
+                                    <b v-text="$root.label('about_published_by')"></b><br />
+                                    <a
+                                        href="https://www.bbaw.de"
+                                        target="_blank"
+                                        v-text="$root.label('bbaw')"
+                                    ></a><br />
                                     Jägerstraße 22/23<br />
-                                    10117 Berlin
+                                    DE-10117 Berlin
                                 </p><p>
-                                    <b>Represented by:</b><br />
+                                    <b v-text="$root.label('about_represented_by')"></b><br />
                                     Professor Dr. Dr. h. c. mult. Christoph Markschies<br />
-                                    Tel.: +49 30 20 37 06 45/-20, E-Mail: bbaw@bbaw.de
+                                    Tel.: +49 30 20 37 06 45/-20, E-Mail: bbaw(at)bbaw.de
                                 </p><p>
-                                    <b>Legal status:</b><br />
-                                    public law legal entity (Rechtsfähige Körperschaft öffentlichen Rechts)
+                                    <b v-text="$root.label('about_legal_status')"></b><br />
+                                    <span v-text="$root.label('about_legal_entity')"></span>
                                 </p><p>
-                                    <b>VAT Identification Nr.:</b><br />
-                                    DE 167 449 058 (according to §27 a of the Value Added Tax Law of the Federal Republic of Germany)
+                                    <b v-text="$root.label('about_vat')"></b><br />
+                                    DE 167 449 058 (<span v-text="$root.label('about_vat_note')"></span>)
                                 </p><p>
-                                    <b>Technical realisation:</b><br />
+                                    <b v-text="$root.label('about_technical')"></b><br />
                                     Jan Köster (jan.koester(at)bbaw.de)<br />
                                     Telota - IT/DH<br />
-                                    Berlin-Brandenburg Academy of Sciences and Humanities<br />
+                                    <span v-text="$root.label('bbaw')"></span><br />
                                     Jägerstraße 22/23<br />
-                                    10117 Berlin<br /><br />
+                                    DE-10117 Berlin<br /><br />
+                                    <a
+                                        href="https://creativecommons.org/licenses/by-nd/4.0/deed.de"
+                                        target="_blank"
+                                        class="caption mt-1"
+                                    >
+                                        CC&nbsp;BY-ND&nbsp;4.0
+                                    </a><br />
                                     2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('')!!}
                                 </p>
                             </div>

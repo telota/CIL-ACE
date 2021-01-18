@@ -8,10 +8,15 @@ const router = new Router ({
     routes: [
         { path: '/', redirect: '/search', },
 
-        // Dashboard
+        // ACE
         {
             path: '/search',
             name: 'search',
+            component: require ('./../pages/search').default,
+        },
+        {
+            path: '/KO/:ko',
+            name: 'search-ko',
             component: require ('./../pages/search').default,
         }
     ],

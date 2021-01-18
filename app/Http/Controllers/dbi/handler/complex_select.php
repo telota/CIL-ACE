@@ -42,7 +42,7 @@ class complex_select {
 
 
             // Prequery -------------------------------------------------------------------
-            $prequery = DB::table($base_name.' AS '.$base_alias) -> select($base_id.' AS id');
+            $countquery = DB::table($base_name.' AS '.$base_alias);// -> select($base_id.' AS id');
 
             // Where
             $where = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_where';
@@ -52,11 +52,71 @@ class complex_select {
             $where_display = $where['display'];
 
             if (!empty($where['where'])) {
-                $prequery = $this -> handleWhere($entity, $allowed_where, $where, $prequery);
+                $countquery = $this -> handleWhere($entity, $allowed_where, $where, $countquery);
+            }
+
+            $counted = $countquery -> count();
+            $count = $pagination['count'] = empty($counted) ? 0 : $counted;
+            //die('count '.$count);
+
+            // Pagination
+            $paginator = new pagination;
+            $pagination = array_merge($pagination, $paginator -> process($count, $input));
+            $offset = $pagination['offset'];
+            $limit = $pagination['limit'];
+
+            // Mainquery -------------------------------------------------------------------
+            if ($count > 0) {
+                // Query
+                $query = DB::table($base_name.' AS '.$base_alias);
+
+                // Join
+                $join = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_join';
+                $join = new $join();
+                $query = $join -> instructions($query);
+
+                // Select
+                $select = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_select';
+                $select = new $select();
+                $query -> select($this -> createSelect($select -> instructions($user)));
+
+                // Where
+                $query = $this -> handleWhere($entity, $allowed_where, $where, $query);
+
+                // Sorting
+                if (empty($input['sort_by'])) {
+                    $pagination['sort_by'] = 'id ASC';
+                    $query -> orderBy($base_id, 'ASC');
+                }
+                else {
+                    $order_by = 'App\Http\Controllers\dbi\entities\\'.$entity.'\request_parametric_order_by';
+                    $order_by = new $order_by();
+                    $allowed_order_by = $order_by -> instructions();
+
+                    $ordered = $this -> orderBy($base_id, $allowed_order_by, $input, $query);
+                    $pagination['sort_by'] = $ordered['sort_by'];
+                    $query = $ordered['query'];
+                }
+
+                $dbi = $query
+                    -> offset($offset)
+                    -> limit($limit)
+                    -> get();
+
+                $dbi = $this -> postProcessing($dbi);
+            }
+            else {
+                if (empty($input['sort_by'])) {
+                    $pagination['sort_by'] = 'id ASC';
+                }
+                else {
+                    $explode = explode('.', $input['sort_by']);
+                    $pagination['sort_by'] = $explode[0].' '.(empty($explode[1]) ? 'ASC' : (strtolower($explode[1]) === 'desc' ? 'DESC' : 'ASC'));
+                }
             }
 
             // Order by
-            if (empty($input['sort_by'])) {
+            /*if (empty($input['sort_by'])) {
                 $pagination['sort_by'] = 'id ASC';
                 $prequery -> orderBy($base_id, 'ASC');
             }
@@ -109,7 +169,7 @@ class complex_select {
                     -> get();
 
                 $dbi = $this -> postProcessing($dbi);
-            }
+            }*/
 
             // Return -------------------------------------------------------------------
             return [
