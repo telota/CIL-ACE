@@ -14,7 +14,20 @@ class request_parametric_order_by {
     }
 
     public function process ($param, $col, $op, $query, $input) {
-        if ($param === 'index' && !empty($input['name'])) {
+        $required = false;
+        if (!empty($input['name'])) {
+            if (in_array(substr($input['name'], 0, 1), ['I', 'V', 'X'])) {
+                if (strlen($input['name']) == 1 || substr($input['name'], 1, 2) === ' ' || substr($input['name'], 1, 2) === ',') {
+                    $required = true;
+                }
+            }
+            if (in_array(substr($input['name'], 0, 2), ['I2', 'II', 'IV', 'VI', 'IX', 'XI', 'XV', 'XX'])) {
+                $required = true;
+            }
+        }
+
+
+        if ($param === 'index' && $required === true) {
             $explode = explode(' ', $input['name']);
             $string = trim($explode[0]);
 
@@ -24,8 +37,8 @@ class request_parametric_order_by {
                         i.name_plain = "'.$string.'" OR
                         i.name_plain LIKE "'.$string.' %" OR
                         i.name_plain LIKE "'.$string.', %"
-                    THEN CONCAT(0, '.$col.')
-                    ELSE CONCAT(1, '.$col.')
+                    THEN CONCAT(1, '.$col.')
+                    ELSE CONCAT(2, '.$col.')
                 END'
                 //'i.name_plain LIKE "'.$string.' %", '.   // NULLs last
                 //$col.' '.$op      // order by given key and operator

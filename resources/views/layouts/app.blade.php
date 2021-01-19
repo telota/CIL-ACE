@@ -155,20 +155,25 @@
 
 
                     <!-- Footer -->
-                    <v-footer app fixed class="primary d-flex justify-center">
-                        <v-card flat class="white--text transparent" @click="about = true">
-                            <span class="font-weight-thin">2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('') !!}&ensp;TELOTA&nbsp;-&nbsp;IT/DH</span>
-                        </v-card>
+                    <v-footer app fixed class="primary d-flex justify-space-between white--text">
+                        <div>
+                            &copy;&nbsp;2020&ndash;{!! date('y') !!}&ensp;<a href="https://www.bbaw.de" target="_blank" class="white--text" v-text="$root.label('bbaw')"></a>
+                        </div>
+                        <div class="d-md-flex justify-end">
+                            <div class="ml-5" style="cursor: pointer" v-text="$root.label('about_header')" @click="dialog.about = true"></div>
+                            <div class="ml-5" style="cursor: pointer" v-text="$root.label('license_header')" @click="dialog.license = true"></div>
+                            <div class="ml-5"><a href="https://www.bbaw.de/datenschutz" target="_blank" class="white--text" v-text="$root.label('consent_declaration')"></a></div>
+                        </div>
                     </v-footer>
 
                 </v-app>
 
 
-                <!-- About -->
-                <v-dialog v-model="about" max-width="500">
+                <!-- Legal Notice -->
+                <v-dialog v-model="dialog.about" max-width="500">
                     <v-card tile>
                         <v-card-text>
-                            <div class="pa-5 title d-flex justify-center">ACE App</div>
+                            <div class="pa-5 title d-flex justify-center" v-text="$root.label('about_header')"></div>
                             <div>
                                 <p>
                                     <b v-text="$root.label('about_published_by')"></b><br />
@@ -191,22 +196,45 @@
                                     DE 167 449 058 (<span v-text="$root.label('about_vat_note')"></span>)
                                 </p><p>
                                     <b v-text="$root.label('about_technical')"></b><br />
-                                    Jan Köster (jan.koester(at)bbaw.de)<br />
                                     Telota - IT/DH<br />
                                     <span v-text="$root.label('bbaw')"></span><br />
                                     Jägerstraße 22/23<br />
-                                    DE-10117 Berlin<br /><br />
-                                    <a
-                                        href="https://creativecommons.org/licenses/by-nd/4.0/deed.de"
-                                        target="_blank"
-                                        class="caption mt-1"
-                                    >
-                                        CC&nbsp;BY-ND&nbsp;4.0
-                                    </a><br />
-                                    2020{!! date('y') > 20 ? ('&ndash;'.date('y')) : ('')!!}
+                                    DE-10117 Berlin
+                                </p><p>
+                                    <div class="primary--text" style="cursor: pointer" v-text="$root.label('license_note')" @click="dialog = { about: false, license: true }"></div>
                                 </p>
                             </div>
-                            <div class="mb-n3 d-flex justify-center"><v-btn text @click="about=false">Close</v-btn></div>
+                            <div class="mb-n3 d-flex justify-center"><v-btn text @click="dialog.about = false">Close</v-btn></div>
+                        </v-card-text>
+                    </v-card>
+                </v-dialog>
+
+
+                <!-- Copyright -->
+                <v-dialog v-model="dialog.license" max-width="500">
+                    <v-card tile>
+                        <v-card-text>
+                            <div class="pa-5 title d-flex justify-center" v-text="$root.label('license_header')"></div>
+                            <div>
+                                <p>
+                                    <b v-text="$root.label('license_rd')"></b><br/>
+                                    <a href="https://cil.bbaw.de/index.php?id=16" target="_blank" v-text="$root.label('imprints')"></a>:
+                                    <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de" target="_blank">CC&nbsp;BY-ND&nbsp;4.0</a><br />
+                                    <a href="https://cil.bbaw.de/index.php?id=18" target="_blank" v-text="$root.label('scheden')"></a>:
+                                    <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de" target="_blank">CC&nbsp;BY-ND&nbsp;4.0</a><br />
+                                    <a href="https://cil.bbaw.de/index.php?id=17" target="_blank" v-text="$root.label('fotos')"></a>:
+                                    <span v-text="$root.label('license_right_ask')"></span>
+                                </p>
+                                <p>
+                                    <b v-text="$root.label('license_sw')"></b><br />
+                                    ACE App<br />
+                                    <a href="https://www.apache.org/licenses/LICENSE-2.0.html" target="_blank">Apache&nbsp;Software, License Version 2.0</a><br />
+                                    <span v-text="$root.label('license_available')"></span>
+                                    <a href="https://github.com/" target="_blank">Github</a><br />
+                                    <span v-text="$root.label('license_author')"></span>: Jan Köster
+                                </p>
+                            </div>
+                            <div class="mb-n3 d-flex justify-center"><v-btn text @click="dialog.license=false">Close</v-btn></div>
                         </v-card-text>
                     </v-card>
                 </v-dialog>

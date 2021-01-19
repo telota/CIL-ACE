@@ -95,7 +95,10 @@ const editor = new Vue({
     data () {
         return {
             loading: false,
-            about: false,
+            dialog: {
+                about: false,
+                license: false
+            },
             consent: null,
             error: {
                 active: false
