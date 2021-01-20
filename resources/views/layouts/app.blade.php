@@ -14,11 +14,120 @@
         <title>CIL | ACE</title>
 
         <!-- Styles -->
+        <style>
+            a {
+                text-decoration: none;
+            }
+
+            .breadcrumbs li a {
+                text-decoration: none;
+            }
+
+            #editor-body {
+                background: url('/background.jpg');
+            }
+
+            .loader {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+            }
+
+            .loader-half-transparent {
+                background: rgba(220, 220, 220, 0.5);
+                z-index: 501;
+            }
+
+            .loader-footer {
+                display: block;
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                width: 500px;
+                height: 54px;
+                margin: -100px 0 0 -250px;
+                color: #222222;
+                text-align: center;
+                font-family: sans-serif;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .loader-background {
+                position: fixed;
+                width: 500px;
+                height: 500px;
+                margin: -250px 0 0 -250px;
+                top: 50%;
+                left: 50%;
+            }
+
+            .loader-background-gradient {
+                position: fixed;
+                width: 500px;
+                height: 500px;
+                margin: -250px 0 0 -250px;
+                top: 50%;
+                left: 50%;
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#232323",endColorstr="#181818",GradientType=1);
+            }
+
+            .loader-text {
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 350px;
+                height: 60px;
+                margin: -30px 0 0 -175px;
+                color: #222222;
+                text-align: center;
+                font-family: sans-serif;
+                font-size: 60px;
+            }
+
+            .loader-spinner {
+                display: block;
+                position: relative;
+                left: 50%;
+                top: 50%;
+                width: 350px;
+                height: 350px;
+                margin: -175px 0 0 -175px;
+            }
+
+            .loader-spinner {
+                border: 8px solid transparent;
+                border-top-color: #222222;
+                border-bottom-color: #222222;
+                border-radius: 50%;
+                -webkit-animation: loader 3s linear infinite;
+                -moz-animation: loader 3s linear infinite;
+                -o-animation: loader 3s linear infinite;
+                animation: loader 3s linear infinite;
+            }
+
+            @keyframes loader {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                    -ms-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    -webkit-transform: rotate(360deg);
+                    -ms-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
         {{--<link rel="shortcut icon" href="favicon.ico">--}}
         {{--<link rel="icon" type="image/png" href="/favicon" sizes="96x96">--}}
         {{--<link rel="icon" type="image/png" href="favicon.png" sizes="96x96">--}}
         {{--<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">--}}
-        <link href="{{ asset('css/extend.css') }}" rel="stylesheet">
+        {{--<link href="{{ asset('ace/css/extend.css') }}" rel="stylesheet">--}}
         {{--<link href="{{ asset('css/editor.css') }}" rel="stylesheet">--}}
         <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
@@ -157,7 +266,7 @@
                     <!-- Footer -->
                     <v-footer app fixed class="primary d-flex justify-space-between white--text">
                         <div>
-                            &copy;&nbsp;2020&ndash;{!! date('y') !!}&ensp;<a href="https://www.bbaw.de" target="_blank" class="white--text" v-text="$root.label('bbaw')"></a>
+                            2020&ndash;{!! date('y') !!}&ensp;<a href="https://www.bbaw.de" target="_blank" class="white--text" v-text="$root.label('bbaw')"></a>
                         </div>
                         <div class="d-md-flex justify-end">
                             <div class="ml-5" style="cursor: pointer" v-text="$root.label('about_header')" @click="dialog.about = true"></div>
@@ -264,7 +373,7 @@
         <!-- Scripts -->
         {{-- <script src="{{ asset('js/manifest.js') }}"></script> --}}
         {{-- <script src="{{ asset('js/vendor.js') }}"></script> --}}
-        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('ace/js/app.js') }}"></script>
 
     </body>
 
