@@ -24,7 +24,7 @@
             }
 
             #editor-body {
-                background: url('/background.jpg');
+                background: url('/ace/img/background.jpg');
             }
 
             .loader {
@@ -186,7 +186,7 @@
                                         <a href="https://cil.bbaw.de" alt="CIL Homepage" target="_blank" style="z-index: 3">
                                             <v-img
                                                 v-if="$vuetify.breakpoint.mdAndUp"
-                                                src="/cil-logo.png"
+                                                src="/ace/img/cil-logo.png"
                                                 max-height="45"
                                                 max-width="250"
                                                 contain
@@ -199,7 +199,7 @@
                                         <a href="https://www.bbaw.de" alte="BBAW Homepage" target="_blank">
                                             <v-img
                                                 v-if="$vuetify.breakpoint.mdAndUp"
-                                                src="/bbaw-logo.svg"
+                                                src="/ace/img/bbaw-logo.svg"
                                                 max-height="45"
                                                 max-width="150"
                                                 contain
@@ -229,7 +229,7 @@
 
 
                     <!-- Routed Component -->
-                    <v-main class="app_bg" style="background: url('/background.jpg')">
+                    <v-main class="app_bg" style="background: url('/ace/img/background.jpg')">
                         <v-fade-transition>
                             <div class="pa-5">
                                 <router-view></router-view>
