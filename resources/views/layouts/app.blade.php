@@ -328,9 +328,9 @@
                                 <p>
                                     <b v-text="$root.label('license_rd')"></b><br/>
                                     <a href="https://cil.bbaw.de/index.php?id=16" target="_blank" v-text="$root.label('imprints')"></a>:
-                                    <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de" target="_blank">CC&nbsp;BY-ND&nbsp;4.0</a><br />
+                                    <a href="https://creativecommons.org/licenses/by/4.0/deed.de" target="_blank">CC&nbsp;BY&nbsp;4.0</a><br />
                                     <a href="https://cil.bbaw.de/index.php?id=18" target="_blank" v-text="$root.label('scheden')"></a>:
-                                    <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de" target="_blank">CC&nbsp;BY-ND&nbsp;4.0</a><br />
+                                    <a href="https://creativecommons.org/licenses/by/4.0/deed.de" target="_blank">CC&nbsp;BY&nbsp;4.0</a><br />
                                     <a href="https://cil.bbaw.de/index.php?id=17" target="_blank" v-text="$root.label('fotos')"></a>:
                                     <span v-text="$root.label('license_right_ask')"></span>
                                 </p>

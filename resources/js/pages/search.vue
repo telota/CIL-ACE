@@ -429,9 +429,9 @@ export default {
         scheden: 'https://cil.bbaw.de/index.php?id=18'
       },
       copyrights: {
-        imprints: { string: 'CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' },
+        imprints: { string: 'CC&nbsp;BY&nbsp;4.0', link: 'https://creativecommons.org/licenses/by/4.0/deed.de' },
         fotos: null,
-        scheden: { string: 'CC&nbsp;BY-ND&nbsp;4.0', link: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de' }
+        scheden: { string: 'CC&nbsp;BY&nbsp;4.0', link: 'https://creativecommons.org/licenses/by/4.0/deed.de' }
       },
       queryRefresh: 0,
       queryDialog: false,
