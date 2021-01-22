@@ -10,8 +10,9 @@ class cil_raw_resources extends Command {
     protected $description  = 'read raw CSVs of Fotos, Imprints and Scheden';
     public function __construct() { parent::__construct(); }
 
+    static $date = '210120';
     static $path = '/opt/projects/cil-laravel/sql/';
-    static $table_base = 'cil_fm.raw';
+    static $table_base = 'raw';
     static $resources = [
         // Fotos
         'fo' => [
@@ -55,12 +56,16 @@ class cil_raw_resources extends Command {
             $records[$entity] = [];
             echo("\nPREPARING ".strtoupper($entity)." - START\n");
             foreach ($parsed_csv AS $row) {
-                $records[$entity][] = self::{'handle_'.$entity}($row);
+                $values = [];
+                foreach (self::{'handle_'.$entity}($row) as $value) {
+                    $values[] = $value === null ? 'null' : ("'".trim(str_replace("'", "\\'", $value))."'");
+                }
+                $records[$entity][] = '('.implode(',', $values).')';
             }
             echo("\nPREPARING ".strtoupper($entity)." - END\n");
             echo("Number of records: ".count($records[$entity])."\n");
             echo("\nWRITING SQL FILE - START\n");
-            self::WriteSearchNames($entity, $records[$entity]);
+            self::write_sql_dump($entity, $records[$entity]);
             echo("\nWRITING SQL FILE - SUCCESS\n");
         }
 
@@ -152,66 +157,69 @@ class cil_raw_resources extends Command {
         return $record;
     }
 
-    static function WriteSearchNames ($entity, $content) {
-        $table = self::$table_base.'_'.date('Y-m-d').'_'.self::$resources[$entity]['table'];
-        $file = self::$resources[$entity]['table'].'.sql';
+    static function write_sql_dump ($entity, $content) {
+        $table = self::$table_base.'_'.self::$date.'_'.self::$resources[$entity]['table'];
+        $file = self::$path.self::$resources[$entity]['table'].'.sql';
+        echo("\t".$file);
 
         $sql =
-'/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE=\'+01:00\' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+            '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'."\n".
+            '/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;'."\n".
+            '/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;'."\n".
+            '/*!40101 SET NAMES utf8 */;'."\n".
+            '/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;'."\n".
+            '/*!40103 SET TIME_ZONE=\'+01:00\' */;'."\n".
+            '/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;'."\n".
+            '/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;'."\n".
+            '/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;'."\n".
+            '/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Table structure for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'DROP TABLE IF EXISTS `'.$table.'`;'."\n".
+            '/*!40101 SET @saved_cs_client     = @@character_set_client */;'."\n".
+            '/*!40101 SET character_set_client = utf8 */;'."\n".
 
---
--- Table structure for table `'.$table.'`
---
-
-DROP TABLE IF EXISTS `'.$table.'`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `'.$table.'` (
-    `id` int NOT NULL,
-    `fm_id` int NOT NULL,';
-
+            // Create Table Statement
+            'CREATE TABLE `'.$table.'` ('."\n".
+                "\t".'`id` int NOT NULL,';
         if ($entity === 'fo') {
-            $sql .=
-    '`author` varchar(255) DEFAULT NULL,
-    `year` int DEFAULT NULL,
-    `is_public` tinyint DEFAULT NULL,';
-        }
-        else if ($entity === 'im') {
-            $sql .=
-    '`number` varchar(255) DEFAULT NULL,
-    `kind` varchar(45) DEFAULT NULL,
-    `scan_3d` varchar(255) DEFAULT NULL,';
+            $sql .= "\n".
+                "\t".'`fm_id` char(9) NOT NULL,'."\n".
+                "\t".'`author` varchar(255) DEFAULT NULL,'."\n".
+                "\t".'`year` int DEFAULT NULL,'."\n".
+                "\t".'`is_public` tinyint DEFAULT NULL,';
+        } else if ($entity === 'im') {
+            $sql .= "\n".
+                "\t".'`fm_id` char(9) NOT NULL,'."\n".
+                "\t".'`number` varchar(255) DEFAULT NULL,'."\n".
+                "\t".'`kind` varchar(45) DEFAULT NULL,'."\n".
+                "\t".'`scan_3d` varchar(255) DEFAULT NULL,';
+        } else if ($entity === 'sc') {
+            $sql .= "\n".
+                "\t".'`fm_id` char(10) NOT NULL,';
         }
 
-        $sql .=
-    'PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+        $sql .= "\n".
+                 "\t".'PRIMARY KEY (`id`)'."\n".
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'."\n".
+            '/*!40101 SET character_set_client = @saved_cs_client */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Dumping data for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'LOCK TABLES `'.$table.'` WRITE;'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;'."\n".
 
---
--- Dumping data for table `'.$table.'`
---
-
-LOCK TABLES `'.$table.'` WRITE;
-/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;
-INSERT INTO `'.$table.'` VALUES ';
-        foreach($content as $row) {
-            foreach
-        }
-implode(',', $content).
-$sql .=
-';
-/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;
-UNLOCK TABLES;';
+            // Insert Values
+            'INSERT INTO `'.$table.'` VALUES '."\n".
+            implode(',', $content)."\n".
+            ';'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;'."\n".
+            'UNLOCK TABLES;';
 
         file_put_contents($file.'.sql', $sql);
     }
