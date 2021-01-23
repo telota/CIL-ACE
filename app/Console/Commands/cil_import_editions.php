@@ -51,7 +51,7 @@ class cil_import_editions extends Command
         ["WE0001", "AE",            "L'Année épigraphique"],
         ["WE0002", "AIJ",           "Antike Inschriften aus Jugoslavien. Heft 1. Noricum und Pannonia superior.  Bearbeitet von Viktor Hoffiller und Balduin Saria"],
         //+
-        ["WE0000", "BAC",           "BAC"],
+        ["WE0000", "BAC",           "Bulletin archéologique du Comité des Travaux Historiques et Scientifiques"],
 
         ["WE0114", "BCAR",          "Bullettino della Commissione Archeologica Comunale di Roma"],
         ["WE0003", "Besevliev",     "Beševliev, Spätgriechische und spätlateinische Inschriften aus Bulgarien"],
@@ -111,7 +111,7 @@ class cil_import_editions extends Command
         ["WE0039", "IHC",           "Hübner, Inscriptiones Hispaniae Christianae"],
         ["WE0111", "IJO",           "Inscriptiones Judaicae Orientis. Volume I. Eastern Europe. Band II. Kleinasien. Volume III. Syria and Cyprus"],
         ["WE0040", "IK",            "Inschriften griechischer Städte aus Kleinasien"],
-        ["WE0152", "IKöln2",        "Galsterer, B.; Galsterer, H., Die römischen Steininschriften aus Köln. IKöln2"],
+        ["WE0152", "IKöln2",        "Galsterer, B.; Galsterer, H., Die römischen Steininschriften aus Köln. IKöln²"],
         ["WE0138", "ILA Arvernes",  "Inscriptions Latines d’Aquitaine (I.L.A.). Rémy, Arvernes"],
         ["WE0145", "ILA Bordeaux",  "Inscriptions Latines d’Aquitaine (I.L.A.). Maurin; Navarro Caballero, Bordeaux"],
         ["WE0139", "ILA Lectoure",  "Inscriptions Latines d’Aquitaine (I.L.A.). Fabre; Sillières, Lectoure"],
@@ -219,8 +219,8 @@ class cil_import_editions extends Command
     ];
 
     static $table       = 'web_editions';
-    static $file_sql    = '../data/cil/output/web_editions.sql';
-    static $file_js     = '../data/cil/output/abbreviations.js';
+    static $file_sql    = '/opt/projects/cil-laravel/output/web_editions.sql';
+    static $file_js     = '/opt/projects/cil-laravel/output/abbreviations.js';
 
 
 
@@ -264,7 +264,7 @@ class cil_import_editions extends Command
             $row[2] = "'".trim(str_replace("'", "\\'", $row[2]))."'";
 
             // Apend to JS content
-            if (!in_array($row[0], self::$cil_wes)) { $js_content [] = '    { k: '.$row[1].', v: '.$row[2].' }';}
+            if (!in_array($row[0], self::$cil_wes)) { $js_content [] = "\t\t\t".'{ k: '.$row[1].', v: '.$row[2].' }';}
 
             // Escape Concordance
             $row[0] = "'".$row[0]."'";
@@ -298,59 +298,64 @@ class cil_import_editions extends Command
 
         $table = self::$table;
 
-        file_put_contents(self::$file_sql,
-'/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE=\'+01:00\' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+        $sql =
+            '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'."\n".
+            '/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;'."\n".
+            '/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;'."\n".
+            '/*!40101 SET NAMES utf8 */;'."\n".
+            '/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;'."\n".
+            '/*!40103 SET TIME_ZONE=\'+01:00\' */;'."\n".
+            '/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;'."\n".
+            '/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;'."\n".
+            '/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;'."\n".
+            '/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Table structure for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'DROP TABLE IF EXISTS `'.$table.'`;'."\n".
+            '/*!40101 SET @saved_cs_client     = @@character_set_client */;'."\n".
+            '/*!40101 SET character_set_client = utf8 */;'."\n".
 
---
--- Table structure for table `'.$table.'`
---
+            // Create Table Statement
+            'CREATE TABLE `'.$table.'` (
+                `id` int NOT NULL AUTO_INCREMENT,
+                `id_we` char(6) NOT NULL,
+                `abbreviation` varchar(255) NOT NULL,
+                `name_full` text NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `abbreviation_UNIQUE` (`abbreviation`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'."\n".
+            '/*!40101 SET character_set_client = @saved_cs_client */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Dumping data for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'LOCK TABLES `'.$table.'` WRITE;'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;'."\n".
 
-DROP TABLE IF EXISTS `'.$table.'`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `'.$table.'` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `id_we` char(6) NOT NULL,
-    `abbreviation` varchar(255) NOT NULL,
-    `name_full` text NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `abbreviation_UNIQUE` (`abbreviation`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+            // Insert Values
+            'INSERT INTO `'.$table.'` VALUES '."\n".
+            implode(',', $content)."\n".
+            ';'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;'."\n".
+            'UNLOCK TABLES;';
 
---
--- Dumping data for table `'.$table.'`
---
-
-LOCK TABLES `'.$table.'` WRITE;
-/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;
-INSERT INTO `'.$table.'` VALUES '.
-implode(',', $content).
-';
-/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;
-UNLOCK TABLES;'
-        );
-
+        file_put_contents(self::$file_sql, $sql);
     }
 
 
     static function WriteJS ($content) {
-
         file_put_contents(self::$file_js,
-"export const state = () => ({\n".
-"  items: [\n".
-    implode(",\n", $content)."\n".
-"  ]\n".
-"})"
+            'export default {'."\n".
+                "\t".'install(Vue, options) {'."\n".
+                    "\t\t".'Vue.prototype.$abbreviations = ['."\n".
+                        implode(",\n", $content)."\n".
+                    "\t\t".']'."\n".
+                "\t".'}'."\n".
+            "}"
         );
 
     }

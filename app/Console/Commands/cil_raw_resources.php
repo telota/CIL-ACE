@@ -11,7 +11,7 @@ class cil_raw_resources extends Command {
     public function __construct() { parent::__construct(); }
 
     static $date = '210120';
-    static $path = '/opt/projects/cil-laravel/sql/';
+    static $path = '/opt/projects/cil-laravel/output/';
     static $table_base = 'raw';
     static $resources = [
         // Fotos

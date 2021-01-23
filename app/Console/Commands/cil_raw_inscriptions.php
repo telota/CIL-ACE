@@ -12,22 +12,30 @@ class cil_raw_inscriptions extends Command
     public function __construct() { parent::__construct(); }
 
     static $date = '210120';
-    static $path = '/opt/projects/cil-laravel/sql/';
+    static $path = '/opt/projects/cil-laravel/output/';
     static $table_base = 'raw';
     static $data = [
         'csv' => '/opt/projects/cil-laravel/fm/co.CSV',
         'table' => 'inscriptions'
     ];
     static $relations = [
-        'fotos',
-        'imprints',
-        'scheden'
+        'imprints' => [
+            'col' => 'Abklatsch',
+            'key' => 'EC',
+        ],
+        'fotos' => [
+            'col' => 'Photothek',
+            'key' => 'PH',
+        ],
+        'scheden' => [
+            'col' => 'Schede',
+            'key' => 'SCH',
+        ]
     ];
 
     // -----------------------------------------------------------------------
     public function handle() {
         $time = date('U');
-
         echo(
             "\n\n".
             "----------------------------------------------------------\n".
@@ -36,16 +44,15 @@ class cil_raw_inscriptions extends Command
         );
 
         // Preparations
-        $records = [];
+        $relations = self::$relations;
+        $parsed_csv = $records = $errors = [];
 
         // Parse CSV
-        $parsed_csv = [];
         echo("\nPARSING - START\n");
         $parsed_csv = self::parse_csv(self::$data['csv'], ';');
         echo("\nPARSING - END\n\n");
 
         // Handle parsed CSV
-        $records = [];
         echo("\nEXTRACTING - START\n");
         foreach ($parsed_csv AS $row) {
             // Inscriptions
@@ -63,53 +70,54 @@ class cil_raw_inscriptions extends Command
             foreach ($record as $value) {
                 $values[] = $value === null ? 'null' : ("'".trim(str_replace("'", "\\'", $value))."'");
             }
-            $records['inscriptions'][] = '('.implode(',', $values).')';
+            $records['inscriptions'][$record['id']] = '('.implode(',', $values).')';
 
-            // Imprints
-            for ($c = 1; $c <= 24; $c++) {
-                $i = 'Abklatsch '.sprintf('%02d', $c);
-                if (!empty($row[$i])) {
-                    if(intval(substr($row[$i], 2, 9)) === 0) {
-                        $errors[] = '"'.$record['fm_id'].'","'.str_replace('"', '\"', $i.": ".$row[$i]).'"';
-                    } else {
-                        $records['imprints'][] = '(null,'.$record['id'].','.intval(substr($row[$i], 2, 9)).')';
+            // Resource Relations
+            foreach ($row as $key => $val) {
+                foreach (array_keys($relations) as $entity) {
+                    $col = $relations[$entity]['col'];
+                    $nr = $relations[$entity]['key'];
+                    if (substr($key, 0, strlen($col)) === $col) {
+                        if (!empty($val)) {
+                            if (substr($val, 0, strlen($nr)) === $nr ) {
+                                $res_id = intval(substr($val, strlen($nr), (7 + strlen($nr))));
+                                $records[$entity][$record['id'].'|'.$res_id] = '(null,'.$record['id'].','.$res_id.')';
+                            }
+                            else {
+                                $errors[] = '"'.implode('","', [
+                                    $record['fm_id'],
+                                    str_replace('"', '\"', $key),
+                                    str_replace('"', '\"', $val),
+                                    ($val === ' ' ? 'Leereintrag (Leerzeichen)' : ("'".$val.'\' ist keine valide '.$nr.'-Nummer'))
+                                ]).'"';
+                            }
+                        }
                     }
-                }
-            }
-            // Fotos
-            for ($c = 1; $c <= 15; $c++) {
-                $i = 'Photothek '.sprintf('%02d', $c);
-                if (!empty($row[$i])) {
-                    $records['fotos'][] = '(null,'.$record['id'].','.intval(substr($row[$i], 2, 9)).')';
-                }
-            }
-            // Scheden
-            for ($c = 1; $c <= 21; $c++) {
-                $i = 'Schede'.sprintf('%02d', $c);
-                if (!empty($row[$i])) {
-                    $records['scheden'][] = '(null,'.$record['id'].','.intval(substr($row[$i], 3, 10)).')';
                 }
             }
         }
         echo("\nEXTRACTING - END\n");
 
-        foreach (array_merge(['inscriptions'], self::$relations) as $entity) {
-            echo("\nWRITING SQL FILE - START\n");
+        foreach (array_merge(['inscriptions'], array_keys($relations)) as $entity) {
+            echo("\nWRITING SQL FILE ");
             self::write_sql_dump($entity, $records[$entity]);
-            echo("\nWRITING SQL FILE - SUCCESS\n");
+            echo(" - SUCCESS");
         }
-
-        if (!empty($errors)) {
-            $errors = implode("\n", $errors);
-
-            file_put_contents('/opt/projects/cil-laravel/sql/imprint-errors.csv', $errors); //, FILE_APPEND
-        }
+        echo("\n");
 
         // Regular End of Script -------------------------------------------------------------------------------------
-        foreach(array_merge(['inscriptions'], self::$relations) as $entity) {
+        foreach(array_merge(['inscriptions'], array_keys($relations)) as $entity) {
             echo("\nNumber of ".strtoupper($entity).": ".count($records[$entity]));
         }
-        echo("\n\nExecution time: ".(date('U') - $time)." sec\n");
+
+        // Write Error Log
+        echo("\n\nNumber of Errors: ".count($errors));
+        if (!empty($errors)) {
+            echo("\nWRITING ERROR LOG");
+            file_put_contents(self::$path.'raw-import-errors.csv', '"Konkordanznummer","Ressource","Wert","Fehlermeldung"'."\n".implode("\n", $errors));
+            echo(" - SUCCESS");
+        }
+        echo("\n\nTotal execution time: ".(date('U') - $time)." sec\n");
         die(
             "\n\n".
             "----------------------------------------------------------\n".
@@ -155,7 +163,7 @@ class cil_raw_inscriptions extends Command
         $name = $entity === 'inscriptions' ? 'inscriptions' : 'inscriptions_to_'.$entity;
         $table = self::$table_base.'_'.self::$date.'_'.$name;
         $file = self::$path.$name.'.sql';
-        echo("\t".$file);
+        echo('"'.$file.'"');
 
         $sql =
             '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'."\n".

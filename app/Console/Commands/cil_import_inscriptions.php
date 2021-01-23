@@ -13,6 +13,7 @@ class cil_import_inscriptions extends Command
 
 
     // -----------------------------------------------------------------------
+    static $latest_import = 210120;
     static $start = 0;
     static $end = 1000000;
     static $delimiters = [
@@ -42,10 +43,10 @@ class cil_import_inscriptions extends Command
 
     static $table_base_inscriptions = 'web_base_inscriptions';
     static $table_search_names      = 'web_search_names';
-    static $file_base_inscriptions  = '../data/cil/output/web_base_inscriptions.sql';
-    static $file_search_names       = '../data/cil/output/web_search_names.sql';
+    static $file_base_inscriptions  = '/opt/projects/cil-laravel/output/web_base_inscriptions.sql';
+    static $file_search_names       = '/opt/projects/cil-laravel/output/web_search_names.sql';
 
-    static $file_errors             = '../data/cil/output/errorlog.csv';
+    static $file_errors             = '/opt/projects/cil-laravel/output/errorlog.csv';
 
     // -----------------------------------------------------------------------
     public function handle()
@@ -65,22 +66,21 @@ class cil_import_inscriptions extends Command
         $start      =   self::$start;
         $end        =   self::$end;
         $editions   =   self::GetEditions();
-                        file_put_contents(self::$file_errors, "Konkordanznummer;Name;Fehlermeldung\n");
+        file_put_contents(self::$file_errors, "Konkordanznummer;Name;Fehlermeldung\n");
 
-
-        // Iterate over CSV
-        foreach( explode("\n", str_replace("\r", '', self::GetFileContent('../data/cil/input/cil_co_to_name.csv'))) as $row) {
-
+        // Iterate over Inscriptions
+        foreach (self::GetInscriptions() as $row) {
             if($i >= $start && $i < $end) {
 
                 // ID / Concordance
-                $id = intval(substr($row, 2, 9)); // id is equal concordance
-                $co = substr($row, 0, 9); // concordance
+                $id = $row['id']; // id is equal concordance
+                $co = $row['fm_id']; // concordance
 
                 // Basic Processing of raw name
-                $name_raw = substr($row, 10); // extract string
-                $name_raw = str_replace('"', '', $name_raw); // delete quotation marks if given (escaped strings)
-                $name_raw = trim($name_raw); // trim to get rid of spaces
+                $row['name_plain'] = str_replace("\r", " ", $row['name_plain']);
+                $row['name_plain'] = str_replace("\n", " ", $row['name_plain']);
+                $row['name_plain'] = str_replace("  ", " ", $row['name_plain']);
+                $name_raw = $row['name_plain'];
 
                 // Go into record
                 if (
@@ -334,7 +334,7 @@ class cil_import_inscriptions extends Command
             $id = $matching_edition ['id'];
 
             // get plain quote
-            $quote_plain = substr($ref, ($ed_length +strlen($matching_edition['delimited_by'])));
+            $quote_plain = substr($ref, ($ed_length + strlen($matching_edition['delimited_by'])));
             $quote_plain = trim(isset($end_clamped_by) ? rtrim($quote_plain, $end_clamped_by) : $quote_plain);
 
             // get formated quote
@@ -615,7 +615,6 @@ class cil_import_inscriptions extends Command
 
 
     static function GetEditions () {
-
         $ed = DB::table('cil_fm.web_editions')
             -> select([
                 'id             AS id',
@@ -629,6 +628,14 @@ class cil_import_inscriptions extends Command
             -> get();
 
         return json_decode($ed, TRUE);
+    }
+
+    static function GetInscriptions() {
+        $dbi = DB::table('cil_fm.raw_'.self::$latest_import.'_inscriptions')
+            -> select(['id', 'fm_id', 'name_plain'])
+            -> get();
+
+        return json_decode($dbi, TRUE);
     }
 
 
@@ -646,18 +653,10 @@ class cil_import_inscriptions extends Command
 
 
     static function WriteErrorLog ($file, $row, $code) {
-
-        $row = trim(str_replace("\r", '', $row));
-
-        if(substr($row, 0, 2) == 'KO') {
-            $row = substr($row, 0, 9).';"'.str_replace('"', '\'', substr($row,10)).'"';
-        }
-        else {
-            $row = 'unbekannt;"'.str_replace('"', '\'', $row).'"';
-        }
-
         file_put_contents($file,
-            $row
+            $row['fm_id']
+            .';'.
+            str_replace(';', ',', $row['name_plain'])
             .';'.
             str_replace(';', '', str_replace('"', '', $code))."\n",
         FILE_APPEND);
@@ -666,101 +665,109 @@ class cil_import_inscriptions extends Command
 
     // SQL FILE WRITER -----------------------------------------------------------------
     static function WriteBaseInscriptions ($content) {
-
         $table = self::$table_base_inscriptions;
 
-        file_put_contents(self::$file_base_inscriptions,
-'/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE=\'+01:00\' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+        $sql =
+            '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'."\n".
+            '/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;'."\n".
+            '/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;'."\n".
+            '/*!40101 SET NAMES utf8 */;'."\n".
+            '/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;'."\n".
+            '/*!40103 SET TIME_ZONE=\'+01:00\' */;'."\n".
+            '/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;'."\n".
+            '/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;'."\n".
+            '/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;'."\n".
+            '/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Table structure for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'DROP TABLE IF EXISTS `'.$table.'`;'."\n".
+            '/*!40101 SET @saved_cs_client     = @@character_set_client */;'."\n".
+            '/*!40101 SET character_set_client = utf8 */;'."\n".
 
---
--- Table structure for table `'.$table.'`
---
+            // Create Table Statement
+            'CREATE TABLE `'.$table.'` (
+                `id` int NOT NULL,
+                `concordance` char(9) NOT NULL,
+                `name_plain` text NOT NULL,
+                `name_formated` text,
+                `name_object` text,
+                `sort_index` varchar(45) DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `concordance_UNIQUE` (`concordance`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'."\n".
+            '/*!40101 SET character_set_client = @saved_cs_client */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Dumping data for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'LOCK TABLES `'.$table.'` WRITE;'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;'."\n".
 
-DROP TABLE IF EXISTS `'.$table.'`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `'.$table.'` (
-    `id` int NOT NULL,
-    `concordance` char(9) NOT NULL,
-    `name_plain` text NOT NULL,
-    `name_formated` text,
-    `name_object` text,
-    `sort_index` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `concordance_UNIQUE` (`concordance`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+            // Insert Values
+            'INSERT INTO `'.$table.'` VALUES '."\n".
+            implode(',', $content)."\n".
+            ';'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;'."\n".
+            'UNLOCK TABLES;';
 
---
--- Dumping data for table `'.$table.'`
---
-
-LOCK TABLES `'.$table.'` WRITE;
-/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;
-INSERT INTO `'.$table.'` VALUES '.
-implode(',', $content).
-';
-/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;
-UNLOCK TABLES;'
-        );
+        file_put_contents(self::$file_base_inscriptions, $sql);
     }
 
 
     static function WriteSearchNames ($content) {
-
         $table = self::$table_search_names;
 
-        file_put_contents(self::$file_search_names,
-'/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE=\'+01:00\' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+        $sql =
+            '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'."\n".
+            '/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;'."\n".
+            '/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;'."\n".
+            '/*!40101 SET NAMES utf8 */;'."\n".
+            '/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;'."\n".
+            '/*!40103 SET TIME_ZONE=\'+01:00\' */;'."\n".
+            '/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;'."\n".
+            '/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;'."\n".
+            '/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'NO_AUTO_VALUE_ON_ZERO\' */;'."\n".
+            '/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Table structure for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'DROP TABLE IF EXISTS `'.$table.'`;'."\n".
+            '/*!40101 SET @saved_cs_client     = @@character_set_client */;'."\n".
+            '/*!40101 SET character_set_client = utf8 */;'."\n".
 
---
--- Table structure for table `'.$table.'`
---
+            // Create Table Statement
+            'CREATE TABLE `'.$table.'` (
+                `id` int NOT NULL,
+                `id_inscription` int NOT NULL,
+                `position` int NOT NULL,
+                `delimiter` varchar(45) DEFAULT NULL,
+                `search_string` varchar(255) NOT NULL,
+                `id_edition` int DEFAULT NULL,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'."\n".
+            '/*!40101 SET character_set_client = @saved_cs_client */;'."\n".
+            "\n".
+            '--'."\n".
+            '-- Dumping data for table `'.$table.'`'."\n".
+            '--'."\n".
+            "\n".
+            'LOCK TABLES `'.$table.'` WRITE;'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;'."\n".
 
-DROP TABLE IF EXISTS `'.$table.'`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `'.$table.'` (
-    `id` int NOT NULL,
-    `id_inscription` int NOT NULL,
-    `position` int NOT NULL,
-    `delimiter` varchar(45) DEFAULT NULL,
-    `search_string` varchar(255) NOT NULL,
-    `id_edition` int DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+            // Insert Values
+            'INSERT INTO `'.$table.'` VALUES '."\n".
+            implode(',', $content)."\n".
+            ';'."\n".
+            '/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;'."\n".
+            'UNLOCK TABLES;';
 
---
--- Dumping data for table `'.$table.'`
---
-
-LOCK TABLES `'.$table.'` WRITE;
-/*!40000 ALTER TABLE `'.$table.'` DISABLE KEYS */;
-INSERT INTO `'.$table.'` VALUES '.
-implode(',', $content).
-';
-/*!40000 ALTER TABLE `'.$table.'` ENABLE KEYS */;
-UNLOCK TABLES;'
-        );
+        file_put_contents(self::$file_search_names, $sql);
     }
 
 
