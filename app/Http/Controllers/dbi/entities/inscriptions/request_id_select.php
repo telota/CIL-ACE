@@ -19,11 +19,11 @@ class request_id_select {
             'name'          => 'i.name_formated',
             'name_object'   => 'i.name_object',
 
-            'edcs'          => 'r.edcs AS edcs',
+            'edcs'          => 'i.edcs AS edcs',
 
-            'fotos'         => 'r.fotos AS fotos',
-            'imprints'      => 'r.imprints AS imprints',
-            'scheden'       => 'r.scheden AS scheden'
+            'fotos'         => 'i.fotos AS fotos',
+            'imprints'      => 'i.imprints AS imprints',
+            'scheden'       => 'i.scheden AS scheden'
         ];
 
         return $select;

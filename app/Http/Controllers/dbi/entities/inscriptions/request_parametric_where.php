@@ -22,7 +22,13 @@ class request_parametric_where {
                 ]
             ],
 
-            'has_edcs'          => [
+            'has_edcs'          => ['raw' => 'IF( i.edcs > "", 1, 0)'],
+            'has_fotos'         => ['raw' => 'IF( i.fotos > "", 1, 0)'],
+            'has_imprints'      => ['raw' => 'IF( i.imprints > "", 1, 0)'],
+            'has_imprints_3d'   => ['raw' => 'IF( i.imprints_3d > "", 1, 0)'],
+            'has_scheden'       => ['raw' => 'IF( i.scheden > "", 1, 0)']
+
+            /*'has_edcs'          => [
                 'where' => ['raw' => 'IF( r.edcs > "", 1, 0)'],
                 'joins' => [
                     [config('dbi.tablenames.resources').' AS r', 'r.id', '=', 'i.id']
@@ -51,7 +57,7 @@ class request_parametric_where {
                 'joins' => [
                     [config('dbi.tablenames.resources').' AS r', 'r.id', '=', 'i.id']
                 ]
-            ]
+            ]*/
         ];
 
         return $where;

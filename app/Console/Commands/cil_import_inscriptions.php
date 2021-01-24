@@ -43,6 +43,7 @@ class cil_import_inscriptions extends Command
 
     static $table_base_inscriptions = 'web_base_inscriptions';
     static $table_search_names      = 'web_search_names';
+    static $path                    = '/opt/projects/cil-laravel/output/';
     static $file_base_inscriptions  = '/opt/projects/cil-laravel/output/web_base_inscriptions.sql';
     static $file_search_names       = '/opt/projects/cil-laravel/output/web_search_names.sql';
 
@@ -66,9 +67,10 @@ class cil_import_inscriptions extends Command
         $start      =   self::$start;
         $end        =   self::$end;
         $editions   =   self::GetEditions();
-        file_put_contents(self::$file_errors, "Konkordanznummer;Name;Fehlermeldung\n");
+        //file_put_contents(self::$file_errors, "Konkordanznummer;Name;Fehlermeldung\n");
 
         // Iterate over Inscriptions
+        echo('PROCESSING - START');
         foreach (self::GetInscriptions() as $row) {
             if($i >= $start && $i < $end) {
 
@@ -90,7 +92,6 @@ class cil_import_inscriptions extends Command
                 ) {
 
                     if(!isset($base_inscriptions[$id])) {
-
                         // Advanced Processing of raw name
                         $name_raw = self::ProcessRawName($name_raw);
 
@@ -99,12 +100,19 @@ class cil_import_inscriptions extends Command
 
                         // Check Parsing result
                         foreach($parsing as $v) {
-                            if ($v['position'] == 1 && empty($v['id_edition'])) { $error = 'FEHLER: Unbekannter Leitbeleg \''.$v['search_string'].'\''; }
-                            else if (strlen($v['search_string']) > 255) { $error = 'FEHLER: Ermittelte Referenz zu lang - mutmaßlicher Lesefehler'; }
+                            if ($v['position'] == 1 && empty($v['id_edition'])) {
+                                $error = true;
+                                $errors[] = [true, $row, 'Unbekannter Leitbeleg \''.$v['search_string'].'\''];
+                                //$error = 'FEHLER: Unbekannter Leitbeleg \''.$v['search_string'].'\'';
+                            }
+                            else if (strlen($v['search_string']) > 255) {
+                                $error = true;
+                                $errors[] = [true, $row, 'Ermittelte Referenz zu lang - mutmaßlicher Lesefehler'];
+                                //$error = 'FEHLER: Ermittelte Referenz zu lang - mutmaßlicher Lesefehler';
+                            }
                         }
 
                         if (!isset($error)) {
-
                             $rebuilt = self::RebuildName($parsing);
                             // ----------------------------------------------------------------------------------------------------
 
@@ -130,7 +138,10 @@ class cil_import_inscriptions extends Command
                                     (!empty($v['id_edition']) ? $v['id_edition'] : 'null')      // id_edition
                                 ]).')';
 
-                                if (empty($v['id_edition'])) { self::WriteErrorLog(self::$file_errors, $row, 'WARNUNG: Unbekannter Beleg \''.$v['search_string'].'\' an Position '.$v['position']); }
+                                if (empty($v['id_edition'])) {
+                                    $errors[] = [false, $row, 'Unbekannter Beleg \''.$v['search_string'].'\' an Position '.$v['position']];
+                                    //self::WriteErrorLog(self::$file_errors, $row, 'WARNUNG: Unbekannter Beleg \''.$v['search_string'].'\' an Position '.$v['position']);
+                                }
                             }
 
                             // ----------------------------------------------------------------------------------------------------
@@ -147,7 +158,7 @@ class cil_import_inscriptions extends Command
                                 'name'  =>  $name_raw
                             ];
 
-                            self::WriteErrorLog(self::$file_errors, $row, $error);
+                            //self::WriteErrorLog(self::$file_errors, $row, $error);
                             unset($error);
                         }
                     }
@@ -159,8 +170,9 @@ class cil_import_inscriptions extends Command
                             'co'    =>  $co,
                             'name'  =>  $name_raw
                         ];
+                        $errors[] = [true, $row, 'Doppelte Konkordanznummer'];
 
-                        self::WriteErrorLog(self::$file_errors, $row, 'FEHLER: Doppelte Konkordanznummer');
+                        //self::WriteErrorLog(self::$file_errors, $row, 'FEHLER: Doppelte Konkordanznummer');
                     }
                 }
 
@@ -170,50 +182,50 @@ class cil_import_inscriptions extends Command
                         'co'    =>  $co,
                         'name'  =>  $name_raw
                     ];
+                    $errors[] = [true, $row, 'Konkordanz oder Name ist leer bzw. ungültig'];
 
-                    self::WriteErrorLog(self::$file_errors, $row, 'FEHLER: Konkordanz oder Name ist leer bzw. ungültig');
+                    //self::WriteErrorLog(self::$file_errors, $row, 'FEHLER: Konkordanz oder Name ist leer bzw. ungültig');
                 }
             }
 
             ++$i; // Increment
         }
-        // ----------------------------------------------------------------------------------------------------------------
-
-        // Write Files
-        self::WriteBaseInscriptions($base_inscriptions);
-        self::WriteSearchNames($search_names);
-
-// Write SQL File
-
-
+        echo("\n\n".'PROCESSING - END'."\n\n");
 
         // ----------------------------------------------------------------------------------------------------------------
 
         // Report Total and Imported
-        echo("\nSUCCESS: CSV analyzed:\n".
-            "total: $i\n".
-            "imported: $success\n"
+        echo("\nSUCCESS: Data analyzed:\n".
+            "\ttotal: $i\n".
+            "\timported: $success\n"
         );
 
         // Report empty Records
-        echo("empties: ".count($empties)."\n");
+        echo("\tempties: ".count($empties)."\n");
         foreach($empties as $empty) {
-            echo("\t".$empty['co']." : ".$empty['name']."\n");
+            echo("\t\t".$empty['co']." : ".$empty['name']."\n");
         }
 
         // Report duplicates
-        echo("duplicates: ".(count($duplicates) / 2)."\n");
+        echo("\tduplicates: ".(count($duplicates) / 2)."\n");
         foreach($duplicates as $duplicate) {
-            echo("\t".$duplicate['co']." : ".$duplicate['name']."\n");
+            echo("\t\t".$duplicate['co']." : ".$duplicate['name']."\n");
         }
 
         // Report Problems
-        echo("problems: ".(count($problems))."\n");
+        echo("\tproblems: ".(count($problems))."\n");
         foreach($problems as $problem) {
-            echo("\t".$problem['co']." : ".$problem['name']."\n");
+            echo("\t\t".$problem['co']." : ".$problem['name']."\n");
         }
+        // ----------------------------------------------------------------------------------------------------------------
 
-        echo("\nexecution time: ".(date('U') - $time)." sec\n");
+        // Write Files
+        echo("\n");
+        self::WriteBaseInscriptions($base_inscriptions);
+        self::WriteSearchNames($search_names);
+        if (isset($errors)) { self::WriteErrorLog($errors); }
+
+        echo("\n\nTotal execution time: ".(date('U') - $time)." sec\n");
 
 
         // Regular End of Script -------------------------------------------------------------------------------------
@@ -247,29 +259,35 @@ class cil_import_inscriptions extends Command
         $name = str_replace(' = = ', ' = ', $name); // Delete double equal
         $name = str_replace('cf ', 'cf. ', $name); // add dot to missspelled "confer"
 
-        // split name
-        $splitted = self::split($delimiters, $name);
-        $splitted = self::GetDelimiters($splitted, $name);
+        // Handle Exceptions
+        if (substr($name, 0, 24) === '(Res gestae Divi Augusti') {
+            $items = self::handle_rgda($name, $editions);
+        }
+        else {
+            // split name
+            $splitted = self::split($delimiters, $name);
+            $splitted = self::GetDelimiters($splitted, $name);
 
-        foreach($splitted AS $split) {
+            // Analyze Split
+            foreach($splitted AS $split) {
+                $analyzed   = self::AnalyzeReference($split['reference'], $editions);
+                $sort_by    = $split['position'] == 1 ? self::MakeSorting($analyzed['id_edition'], $analyzed['quote_plain']) : null;
 
-            $analyzed   = self::AnalyzeReference( $split['reference'], $editions);
-            $sort_by    = $split['position'] == 1 ? self::MakeSorting($analyzed['id_edition'], $analyzed['quote_plain']) : null;
-
-            $items [] = [
-                'position'          => $split['position'],
-                'delimiter'         => $split['delimiter'],
-                'ref_original'      => $split['reference'],
-                'search_string'     => $analyzed['search_string'],
-                'id_edition'        => $analyzed['id_edition'],
-                'ref_short'         => $analyzed['short'],
-                'ref_full'          => $analyzed['full'],
-                'quote_plain'       => $analyzed['quote_plain'],
-                'quote_formated'    => $analyzed['quote_formated'],
-                'start_clamped_by'  => $analyzed['start_clamped_by'],
-                'end_clamped_by'    => $analyzed['end_clamped_by'],
-                'sort_by'           => $sort_by
-            ];
+                $items[] = [
+                    'position'          => $split['position'],
+                    'delimiter'         => $split['delimiter'],
+                    'ref_original'      => $split['reference'],
+                    'search_string'     => $analyzed['search_string'],
+                    'id_edition'        => $analyzed['id_edition'],
+                    'ref_short'         => $analyzed['short'],
+                    'ref_full'          => $analyzed['full'],
+                    'quote_plain'       => $analyzed['quote_plain'],
+                    'quote_formated'    => $analyzed['quote_formated'],
+                    'start_clamped_by'  => $analyzed['start_clamped_by'],
+                    'end_clamped_by'    => $analyzed['end_clamped_by'],
+                    'sort_by'           => $sort_by
+                ];
+            }
         }
 
        //die("\n".print_r($items)."\n");
@@ -392,6 +410,59 @@ class cil_import_inscriptions extends Command
         else if (substr($ref, 0, 11) === 'Suppl. It, ')     { $ref = 'Suppl. It. '.substr($ref, 11); }
 
         return $ref;
+    }
+
+
+    static function handle_rgda ($name, $editions) {
+        $explode = explode(') III', $name);
+        $start = $explode[0].') ';
+        $i = 1;
+        $found_delimiters = [];
+
+        foreach(explode('III', $explode[1]) as $item) {
+            $ref_original   = trim('III'.$item);
+            $ref_cut        = $ref_original;
+            $end_clamped_by = null;
+
+            if (substr($ref_cut, -1) === '.' && substr($ref_cut, -2) !== 'f.') {
+                $end_clamped_by = substr($ref_cut, -1);
+                $ref_cut = substr($ref_cut, 0, -1);
+            }
+            else if ($i > 1) {
+                $space_explode = explode(" ", $ref_cut);
+                $last = trim(array_pop($space_explode));
+                foreach (self::$delimiters as $delimiter) {
+                    if ($last === $delimiter) {
+                        $found_delimiters[$i + 1] = $delimiter;
+                        $ref_cut = trim(implode(" ", $space_explode));
+                    }
+                }
+            }
+
+            $analyzed       = self::AnalyzeReference($ref_cut, $editions);
+            $sort_by        = $i == 1 ? self::MakeSorting($analyzed['id_edition'], $analyzed['quote_plain']) : null;
+
+            $items[] = [
+                'position'          => $i,
+                'delimiter'         => empty($found_delimiters[$i]) ? null : $found_delimiters[$i],
+                'ref_original'      => $ref_original,
+                'search_string'     => $analyzed['search_string'].(substr($ref_cut, -1) === ')' ? ')' : ''),
+                'id_edition'        => $analyzed['id_edition'],
+                'ref_short'         => $analyzed['short'].(substr($ref_cut, -1) === ')' ? ')' : ''),
+                'ref_full'          => $analyzed['full'].(substr($ref_cut, -1) === ')' ? ')' : ''),
+                'quote_plain'       => $analyzed['quote_plain'].(substr($ref_cut, -1) === ')' ? ')' : ''),
+                'quote_formated'    => $analyzed['quote_formated'].(substr($ref_cut, -1) === ')' ? ')' : ''),
+                'start_clamped_by'  => null,
+                'end_clamped_by'    => $end_clamped_by,
+                'sort_by'           => $sort_by
+            ];
+            ++$i;
+        }
+
+        // Add Name as clamping start
+        $items[0]['start_clamped_by'] = $start;
+//die(print_r($items));
+        return $items;
     }
 
 
@@ -651,20 +722,35 @@ class cil_import_inscriptions extends Command
         }
     }
 
+    static function WriteErrorLog ($input) {
+        echo("\n");
+        $content = [
+            'warnings' => [],
+            'errors' => []
+        ];
 
-    static function WriteErrorLog ($file, $row, $code) {
-        file_put_contents($file,
-            $row['fm_id']
-            .';'.
-            str_replace(';', ',', $row['name_plain'])
-            .';'.
-            str_replace(';', '', str_replace('"', '', $code))."\n",
-        FILE_APPEND);
+        foreach ($input as $row) {
+            $content[$row[0] === true ? 'errors' : 'warnings'][] = '"'.implode('","', [
+                $row[1]['fm_id'],
+                str_replace('"', '\"', $row[1]['name_plain']),
+                str_replace('"', '\"', $row[2])
+            ]).'"';
+        }
+
+        foreach (['warnings', 'errors'] as $class) {
+            if (!empty($content[$class])) {
+                echo('WRITING '.count($content[$class]).' '.$class.' TO LOG FILE ... ');
+                $header = ["Konkordanznummer,Name,Problem"];
+                file_put_contents(self::$path.'processing_'.$class.'.csv', implode("\n", array_merge($header, $content[$class])));
+                echo("SUCCESS \n");
+            }
+        }
     }
 
 
     // SQL FILE WRITER -----------------------------------------------------------------
     static function WriteBaseInscriptions ($content) {
+        echo('WRITING INSCRIPTION FILES ... ');
         $table = self::$table_base_inscriptions;
 
         $sql =
@@ -715,10 +801,12 @@ class cil_import_inscriptions extends Command
             'UNLOCK TABLES;';
 
         file_put_contents(self::$file_base_inscriptions, $sql);
+        echo("SUCCESS\n");
     }
 
 
     static function WriteSearchNames ($content) {
+        echo('WRITING SERACHNAMES FILES ... ');
         $table = self::$table_search_names;
 
         $sql =
@@ -768,6 +856,7 @@ class cil_import_inscriptions extends Command
             'UNLOCK TABLES;';
 
         file_put_contents(self::$file_search_names, $sql);
+        echo("SUCCESS\n");
     }
 
 

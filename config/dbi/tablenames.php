@@ -2,6 +2,6 @@
 
 return [
     // Primary Entities
-    'inscriptions'  => 'web_base_inscriptions',
+    'inscriptions'  => 'web_inscriptions',
     'resources'     => 'web_resources'
 ];

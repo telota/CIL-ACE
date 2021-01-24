@@ -164,7 +164,8 @@
                                     v-for="(ref, r) in d.name_object"
                                     :key="r"
                                 ><!--
-                                    --><span v-if="ref.delimiter" v-html="'&nbsp;' + ref.delimiter + '&nbsp;'"></span><!--
+                                    --><span v-if="!ref.delimiter && ref.position != 1" v-html="'&nbsp;'"></span><!--
+                                    --><span v-else-if="ref.delimiter" v-html="'&nbsp;' + ref.delimiter + '&nbsp;'"></span><!--
                                     --><span v-text="ref.clamped.start"></span><!--
                                     --><v-tooltip bottom><!--
                                         --><template v-slot:activator="{on}"><!--
@@ -214,7 +215,7 @@
                           <v-row>
                             <v-col
                               v-for="r in d[record]"
-                              :key="r.id"
+                              :key="record + 'body' + r.id"
                               cols="12"
                               sm="6"
                               md="3"
@@ -229,7 +230,7 @@
                                 <v-btn
                                   v-if="record === 'imprints' && r.link"
                                   fab
-                                  x-small
+                                  small
                                   color="primary"
                                   v-text="'3D'"
                                   class="mr-1"
@@ -238,12 +239,13 @@
                                 ></v-btn>
                                 <!-- Placeholder -->
                                 <v-responsive
-                                  v-if="record === 'imprints' ? !r.fotos : !r.link"
+                                  v-if="!BuildFileLink(record, r, 250)"
                                   aspect-ratio="1"
                                   class="d-flex align-center text-center caption text-uppercase"
                                 >
-                                  <div v-if="r.link" v-text="$root.label('only_3d')"></div>
-                                  <div v-else v-text="$root.label('no_digital')"></div>
+                                    <div v-text="$root.label('img_private')"></div>
+                                  <!--<div v-if="r.link" v-text="$root.label('only_3d')"></div>
+                                  <div v-else v-text="$root.label('no_digital')"></div>-->
                                 </v-responsive>
                                 <!-- Image Tile -->
                                 <v-card
@@ -256,7 +258,7 @@
                                   <v-img
                                     contain
                                     aspect-ratio="1"
-                                    :src="digilib_scaler + (record === 'imprints' ? r.fotos[0].link : r.link) + '&dw=300&dh=300'"
+                                    :src="BuildFileLink(record, r, 250)"
                                   ></v-img>
                                 </v-card>
                                 <div
@@ -267,7 +269,7 @@
                             </v-col>
                           </v-row>
                           <!-- 3D Credits -->
-                          <div v-if="record === 'imprints' ? (d[record].find((r) => r)) : false" class="caption mt-1">
+                          <div v-if="record === 'imprints' ? (d[record].find((r) => r.link)) : false" class="caption mt-1">
                             <a href="https://www.einsteinfoundation.de/" target="_blank" v-text="$root.label('credit_3d')"></a>
                           </div>
                         </div>
@@ -364,6 +366,7 @@
         <div class="pa-3">
           <!-- Image -->
           <v-img
+            v-if="image.link"
             contain
             :src="image.link"
             :max-width="img_size.width"
@@ -630,12 +633,40 @@ export default {
       ++this.queryRefresh
     },
 
+    BuildFileLink (entity, data, scale) {
+        let link = null
+
+        if (entity === 'fotos') {
+            if (!data.is_public) {
+                return null
+            }
+            else {
+                link = data.fmid + '.jpg'
+            }
+        }
+        else if (entity === 'imprints') {
+            link = 'P' + data.fmid + '.jpg'
+        }
+        else if (entity === 'scheden') {
+            link = data.fmid + '.jpg'
+        }
+
+        return this.digilib_scaler + link + '&dw=' + (scale ? scale : this.img_size.width) + '&dh=' + (scale ? scale : this.img_size.height)
+    },
+
     ImageDialog (entity, data) {
       const self = this
       if (entity) {
         const id = data.fmid ? data.fmid : (data.id ? data.id : '--')
         const right = []
         const left = []
+        // Number and Kind
+        if (data.number || data.kind) {
+          const detail = []
+          if (data.number) { detail.push(data.number) }
+          if (data.kind) { detail.push(data.kind) }
+          left.push(detail.join(', '))
+        }
         // Author and Year
         if (data.author || data.year) {
           const creation = []
@@ -654,7 +685,7 @@ export default {
           right.push('<a href="' + this.info[entity] + '" target="_blank">' + this.$root.label('further_information') + '</a>')
         }
         // Image Link
-        const link = this.digilib_scaler + (entity === 'imprints' ? data.fotos?.[0]?.link : data.link) + '&dw=' + this.img_size.width + '&dh=' + this.img_size.height
+        const link = this.BuildFileLink(entity, data)
         // Write Data
         this.image.entity = entity
         this.image.id = id
