@@ -31,58 +31,59 @@
             <!-- Filter Container  ----------------------------------------------------- ----------------------------------------------------- -->
             <v-expand-transition>
                 <v-card-text v-if="filterExpanded">
-                <v-row>
-                    <!-- Name -->
-                    <v-col cols=12 lg=6 class="pt-0">
-                    <v-text-field
-                        id="search_name"
-                        v-model="query.name"
-                        :key="'A' + queryRefresh"
-                        :label="$root.label('inscription')"
-                        clearable
-                        v-on:keyup.enter="RunSearch()"
-                    ></v-text-field>
-                    </v-col>
-                    <!-- Resources -->
-                    <v-col cols=12 lg=6 :class="$vuetify.breakpoint.lgAndUp ? 'pt-8' : 'pt-0'">
-                        <v-row class="pt-0">
-                            <v-col
-                                v-for="record in ['has_imprints', 'has_imprints_3d', 'has_fotos', 'has_scheden']"
-                                :key="record + queryRefresh"
-                                cols=6
-                                xl=3
-                                class="pt-0 ma-0"
-                            >
-                                <v-checkbox
-                                    v-model="query[record]"
-                                    :label="$root.label(record.slice(4))"
-                                    class="ma-0 pa-0"
-                                ></v-checkbox>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
+                    <v-row>
+                        <!-- Name -->
+                        <v-col cols=12 lg=6 class="pt-0">
+                            <v-text-field
+                                id="search_name"
+                                v-model="query.name"
+                                :key="'A' + queryRefresh"
+                                :label="$root.label('inscription')"
+                                clearable
+                                v-on:keyup.enter="RunSearch()"
+                            ></v-text-field>
+                        </v-col>
+                        <!-- Resources -->
+                        <v-col cols=12 lg=6 :class="$vuetify.breakpoint.lgAndUp ? 'pt-8' : 'pt-0'">
+                            <v-row class="pt-0">
+                                <v-col
+                                    v-for="record in ['has_imprints', 'has_imprints_3d', 'has_fotos', 'has_scheden']"
+                                    :key="record + queryRefresh"
+                                    cols=6
+                                    xl=3
+                                    class="pt-0 ma-0"
+                                >
+                                    <v-checkbox
+                                        v-model="query[record]"
+                                        :label="$root.label(record.slice(4))"
+                                        class="ma-0 pa-0"
+                                    ></v-checkbox>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
 
-                <!-- Search Button ----------------------------------------------------- -->
-                <v-row justify="center" align="center">
-                    <v-col cols="12" sm="4" class="mb-n4 mt-n2">
-                    <v-btn large tile block color="primary" @click="RunSearch()">
-                        <span
-                            class="title"
-                            v-text="$root.label('search')"
-                        ></span>
-                    </v-btn>
-                    <div class="pt-2 mb-4 d-flex justify-center">
-                        <v-btn
-                            text
-                            small
-                            v-text="$root.label('search_reset')"
-                            @click="ResetFilters(true)"
-                        ></v-btn>
-                    </div>
-                    </v-col>
-                </v-row>
+                    <!-- Search Button ----------------------------------------------------- -->
+                    <v-row justify="center" align="center">
+                        <v-col cols="12" sm="4" class="mb-n4 mt-n2">
+                        <v-btn large tile block color="primary" @click="RunSearch()">
+                            <span
+                                class="title"
+                                v-text="$root.label('search')"
+                            ></span>
+                        </v-btn>
+                        <div class="pt-2 mb-4 d-flex justify-center">
+                            <v-btn
+                                text
+                                small
+                                v-text="$root.label('search_reset')"
+                                @click="ResetFilters(true)"
+                            ></v-btn>
+                        </div>
+                        </v-col>
+                    </v-row>
 
+                    <div class="body-1 mb-n2 mt-n1"><b>Ansprechpartner:</b> <a href="mailto:dbcil@bbaw.de">Dipl.-Hist. Marcus Dohnicht</a></div>
                 </v-card-text>
             </v-expand-transition>
         </v-card>
