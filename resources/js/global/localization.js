@@ -82,7 +82,7 @@ export default {
                 abbreviations_note: 'To search for other editions, see the authoritative <b>abbreviations</b>.',
                 copy_right_ask: 'Please inquire about the legal status.',
                 credit_3d: 'The 3D digitization was funded by the Einstein Foundation.',
-                edcs_note: 'Text und further informationen on',
+                edcs_note: 'Text and further informationen on',
                 foto: 'Foto',
                 fotos: 'Fotos',
                 further_information: 'Further informationen',

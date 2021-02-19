@@ -214,53 +214,73 @@
                           <!-- Body -->
                           <v-row>
                             <v-col
-                              v-for="r in d[record]"
-                              :key="record + 'body' + r.id"
-                              cols="12"
-                              sm="6"
-                              md="3"
-                              lg="2"
+                                v-for="r in d[record]"
+                                :key="record + 'body' + r.id"
+                                cols="12"
+                                sm="6"
+                                md="3"
+                                lg="2"
                             >
                               <!-- Tile -->
-                              <v-card
+                            <v-card
                                 tile
                                 class="bar_prim pa-1"
                                 style="position: relative"
-                              >
+                            >
                                 <v-btn
-                                  v-if="record === 'imprints' && r.link"
-                                  fab
-                                  small
-                                  color="primary"
-                                  v-text="'3D'"
-                                  class="mr-1"
-                                  style="position: absolute; right: 0; z-index: 10"
-                                  @click="OpenNewBrowserTab(r.link)"
+                                    v-if="record === 'imprints' && r.link"
+                                    fab
+                                    small
+                                    color="primary"
+                                    v-text="'3D'"
+                                    class="mr-1"
+                                    style="position: absolute; right: 0; z-index: 10"
+                                    @click="OpenNewBrowserTab(r.link)"
                                 ></v-btn>
-                                <!-- Placeholder -->
+                                <!-- Placeholder
                                 <v-responsive
-                                  v-if="!BuildFileLink(record, r, 250)"
-                                  aspect-ratio="1"
-                                  class="d-flex align-center text-center caption text-uppercase"
-                                >
-                                    <div v-text="$root.label('img_private')"></div>
-                                  <!--<div v-if="r.link" v-text="$root.label('only_3d')"></div>
-                                  <div v-else v-text="$root.label('no_digital')"></div>-->
-                                </v-responsive>
-                                <!-- Image Tile -->
-                                <v-card
-                                  v-else
-                                  tile
-                                  flat
-                                  class="transparent"
-                                  @click="ImageDialog(record, r)"
-                                >
-                                  <v-img
-                                    contain
+                                    v-if="!r.is_public"
                                     aspect-ratio="1"
-                                    :src="BuildFileLink(record, r, 250)"
-                                  ></v-img>
-                                </v-card>
+                                    class="d-flex align-center text-center caption text-uppercase"
+                                >
+                                    <div v-text="$root.label('img_private')"></div> -->
+                                <!--<div v-if="r.link" v-text="$root.label('only_3d')"></div>
+                                <div v-else v-text="$root.label('no_digital')"></div>-->
+                                <v-responsive aspect-ratio="1" style="position: relative">
+                                    <div
+                                        class="d-flex align-center justify-center"
+                                        style="position: absolute; top: 0; bottom: 0; left: 0; right: 0"
+                                    >
+                                        <div
+                                            class="caption text-uppercase"
+                                            v-text="r.link ? '3D Scan' : $root.label('img_private')"
+                                        ></div>
+                                    </div>
+                                    <v-img
+                                        contain
+                                        aspect-ratio="1"
+                                        :src="r.img"
+                                        style="cursor: pointer"
+                                        @error="r.is_public = 0"
+                                        @click="clickImage(record, r)"
+                                    ></v-img>
+                                </v-responsive>
+                                <!-- Image Tile
+                                <v-card
+                                    v-else
+                                    tile
+                                    flat
+                                    class="transparent"
+                                    @click="ImageDialog(record, r)"
+                                >
+                                    <div v-text="r.link ? 'loading' : $root.label('img_private')" class="position: absolute"></div>
+                                    <v-img
+                                        contain
+                                        aspect-ratio="1"
+                                        :src="r.link"
+                                        @error="r.link = null"
+                                    ></v-img>
+                                </v-card> -->
                                 <div
                                   class="caption pa-1 mb-n1 text-center"
                                   v-text="r.fmid"
@@ -452,6 +472,7 @@ export default {
         last: null
       },
       digilib_scaler: 'https://digilib.bbaw.de/digitallibrary/servlet/Scaler?fn=silo10/CIL/',
+      silo: 'https://cil.bbaw.de/ace/files/'
       //digilib_viewer: this.$store.state.settings.digilib.viewer
     }
   },
@@ -618,12 +639,36 @@ export default {
     async ToggleItem (id, url) { // Toggle Details in Result List
       if (!this.itemsExpanded.includes(id)) {
         const fetch = await this.FetchData(url)
-        this.itemsDetails[id] = fetch.contents ? fetch.contents[0] : {}
+        //this.itemsDetails[id] = fetch?.contents ? fetch.contents[0] : {}
+        this.itemsDetails[id] = fetch?.contents ? this.processSingleItem(fetch.contents[0]) : {}
         this.itemsExpanded.push(id)
-      } else {
+      }
+      else {
         this.itemsExpanded.splice(this.itemsExpanded.indexOf(id), 1)
         delete this.itemsDetails[id]
       }
+    },
+
+    processSingleItem(content) {
+        const item = {}
+        Object.keys(content).forEach((key) => {
+            if (['imprints', 'fotos', 'scheden'].includes(key)) {
+                let resources = null
+                if (content[key]?.[0]) {
+                    resources = []
+                    content[key].forEach((r) => {
+                        r.is_public = r.is_public === 0 ? 0 : 1
+                        r.img = r.is_public ? (this.silo + (key === 'imprints' ? 'P' : '') + r.fmid + '.jpg') : null
+                        resources.push(r)
+                    })
+                }
+                item[key] = resources
+            }
+            else {
+                item[key] = content[key]
+            }
+        })
+        return item
     },
 
     ResetFilters () { // Reset Search Form Fields to empty
@@ -633,7 +678,19 @@ export default {
       ++this.queryRefresh
     },
 
-    BuildFileLink (entity, data, scale) {
+    clickImage (record, r) {
+        if (r.is_public) {
+            this.ImageDialog(record, r)
+        }
+        else if (record === 'imprints' && r.link) {
+            this.OpenNewBrowserTab(r.link)
+        }
+        else {
+            alert(this.$root.label('img_private'))
+        }
+    },
+
+    /*BuildFileLink (entity, data, scale) {
         let link = null
 
         if (entity === 'fotos') {
@@ -651,8 +708,14 @@ export default {
             link = data.fmid + '.jpg'
         }
 
-        return this.digilib_scaler + link + '&dw=' + (scale ? scale : this.img_size.width) + '&dh=' + (scale ? scale : this.img_size.height)
+        return this.silo + link //+ '&dw=' + (scale ? scale : this.img_size.width) + '&dh=' + (scale ? scale : this.img_size.height)
     },
+
+    errorLoad (id, section, index) {
+        console.log(id + ' ' + section + ' ' + index)
+        this.itemsDetails[id][section][index].error = true
+//itemsDetails[item.id][record][ri].error = true
+    },*/
 
     ImageDialog (entity, data) {
       const self = this
@@ -685,11 +748,11 @@ export default {
           right.push('<a href="' + this.info[entity] + '" target="_blank">' + this.$root.label('further_information') + '</a>')
         }
         // Image Link
-        const link = this.BuildFileLink(entity, data)
+        //const link = this.BuildFileLink(entity, data)
         // Write Data
         this.image.entity = entity
         this.image.id = id
-        this.image.link = link
+        this.image.link = data.img
         this.image.right = right.join(', ')
         this.image.left = left.join(', ')
         this.image.active = true

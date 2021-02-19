@@ -131,7 +131,7 @@ class cil_import_editions extends Command
         ["WE0048", "ILLPRON",       "Inscriptionum lapidariarum latinarum provinciae Norici usque ad annum MCMLXXXIV repertarum indices. Fasciculus primus. Catalogus"],
         ["WE0049", "ILLRP",         "Degrassi, Inscriptiones Latinae liberae rei publicae"],
         ["WE0050", "ILM",           "Chatelain, Inscriptions latines du Maroc"],
-        ["WE0128", "ILN I Frèjus",  "Inscriptions latines de Narbonnaise (I.L.N.). [I.] Gascou; Janon, Fréjus"],
+        ["WE0128", "ILN I Fréjus",  "Inscriptions latines de Narbonnaise (I.L.N.). [I.] Gascou; Janon, Fréjus"],
         ["WE0129", "ILN II Antibes", "Inscriptions latines de Narbonnaise (I.L.N.). II. Chastagnol, Antibes, Riez, Digne"],
         ["WE0131", "ILN II Digne",  "Inscriptions latines de Narbonnaise (I.L.N.). II. Chastagnol, Antibes, Riez, Digne"],
         ["WE0130", "ILN II Riez",   "Inscriptions latines de Narbonnaise (I.L.N.). II. Chastagnol, Antibes, Riez, Digne"],

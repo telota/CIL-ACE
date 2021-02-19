@@ -17,6 +17,7 @@ class request_parametric_where {
                 ],
                 'orWhere' => [
                     ['wsn.search_string', '=', '', ''],
+                    ['wsn.search_string', 'LIKE', '', '/%'],
                     ['wsn.search_string', 'LIKE', '', ' %'],
                     ['wsn.search_string', 'LIKE', '', ', %']
                 ]

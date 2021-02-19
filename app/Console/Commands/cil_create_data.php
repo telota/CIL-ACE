@@ -13,7 +13,7 @@ class cil_create_data extends Command
 
 
     // -----------------------------------------------------------------------
-    static $latest_import   = 210120;
+    static $latest_import   = 210902;
     static $table           = 'web_inscriptions';
     static $file            = '/opt/projects/cil-laravel/output/web_inscriptions.sql';
 

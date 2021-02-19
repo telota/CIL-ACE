@@ -13,7 +13,7 @@ class cil_import_inscriptions extends Command
 
 
     // -----------------------------------------------------------------------
-    static $latest_import = 210120;
+    static $latest_import = 210902;
     static $start = 0;
     static $end = 1000000;
     static $delimiters = [
@@ -338,6 +338,7 @@ class cil_import_inscriptions extends Command
 
                 $matching_edition['id']     = $edition['id'];
                 $matching_edition['a']      = $edition['a'];
+                //if ($edition['a'] === 'IKöln2') { $edition['a'] = 'IKöln²'; }
                 $matching_edition['name']   = $edition['name'];
 
                 // stop loop
@@ -349,7 +350,7 @@ class cil_import_inscriptions extends Command
         if(isset($matching_edition)) {
 
             // set edition ID
-            $id = $matching_edition ['id'];
+            $id = $matching_edition['id'];
 
             // get plain quote
             $quote_plain = substr($ref, ($ed_length + strlen($matching_edition['delimited_by'])));
@@ -393,7 +394,7 @@ class cil_import_inscriptions extends Command
 
         else if (substr($ref, 0, 4) === 'HEp ')             { $ref = 'HEp. '.substr($ref, 4); }
 
-        else if (substr($ref, 0, 8) === 'ILN I Fr')         { $ref = 'ILN I Frèjus '.substr($ref, 13); }
+        else if (substr($ref, 0, 8) === 'ILN I Fr')         { $ref = 'ILN I Fréjus '.substr($ref, 13); }
 
         else if (substr($ref, 0, 9) === 'ILAlg.II ')        { $ref = 'ILAlg. II '.substr($ref, 9); }
         else if (substr($ref, 0, 7) === 'ILalg. ')          { $ref = 'ILAlg. '.substr($ref, 7); }

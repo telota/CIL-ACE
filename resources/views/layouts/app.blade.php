@@ -170,7 +170,7 @@
                     <v-app-bar
                         app
                         fixed
-                        style="border-bottom: 4px solid #b51212; background-color: #fefefe"
+                        style="background-color: #fefefe"
                     >
                         <v-row justify="center" align="center">
                             <v-col cols="12" sm="10">
@@ -221,20 +221,20 @@
                         </div>
                     </v-app-bar>
 
-<!-- Beta -->
+<!-- Beta
 <div class="title text-center red--text" style="width: 100%; z-index:20; position: absolute; top: 68px">
     <span>Diese Seite befindet sich noch im Aufbau. Bitte nutzen Sie die</span>
     <a href="http://cil-old.bbaw.de/dateien/datenbank.php">alten Seite.</a>
-</div>
+</div>-->
 
 
                     <!-- Routed Component -->
                     <v-main class="app_bg" style="background: url('/ace/img/background.jpg')">
-                        <v-fade-transition>
-                            <div class="pa-5">
-                                <router-view></router-view>
-                            </div>
-                        </v-fade-transition>
+                        <div style="border-top: 5px solid #b51212; padding: 3rem 0; border-top-left-radius:220px 100px;">
+                            <v-fade-transition>
+                                <router-view class="mt-n5"></router-view>
+                            </v-fade-transition>
+                        </div>
                     </v-main>
 
                     <!-- Tracking Consent -->
@@ -243,7 +243,10 @@
                         tile
                         style="position: fixed; bottom: 50px; right: 20px; width: 250px"
                     >
-                        <v-card-text class="caption text-justify">
+                        <div class="mr-1 mt-1 d-flex justify-end">
+                            <v-icon small @click="consent = false">clear</v-icon>
+                        </div>
+                        <v-card-text class="caption text-justify mt-n3">
                             <span v-text="$root.label('consent_note')"></span>
                             <a
                                 href="https://www.bbaw.de/datenschutz"
@@ -253,25 +256,25 @@
                                 v-text="$root.label('consent_declaration')"
                             ></a>.
                         </v-card-text>
-                            <v-card-actions class="pt-0">
+                        <v-card-actions class="pt-0">
                             <v-spacer></v-spacer>
-                            <v-btn small text @click="consent = false" v-text="$root.label('decline')" class="bar_prim--text"></v-btn>
+                            <v-btn small text v-text="$root.label('decline')" class="bar_prim--text" @click="consent = false"></v-btn>
                             <v-spacer></v-spacer>
-                            <v-btn small text @click="consent = true" v-text="$root.label('accept')"></v-btn>
+                            <v-btn small text v-text="$root.label('accept')" @click="consent = true"></v-btn>
                             <v-spacer></v-spacer>
                         </v-card-actions>
                     </v-card>
 
 
                     <!-- Footer -->
-                    <v-footer app fixed class="primary d-flex justify-space-between white--text">
-                        <div>
-                            2020&ndash;{!! date('y') !!}&ensp;<a href="https://www.bbaw.de" target="_blank" class="white--text" v-text="$root.label('bbaw')"></a>
+                    <v-footer app fixed class="primary d-flex justify-space-between white--text caption">
+                        <div class="text-truncate">
+                            <a href="https://www.bbaw.de" target="_blank" class="white--text" v-text="$root.label('bbaw')"></a>&ensp;2020&ndash;{!! date('y') !!}
                         </div>
-                        <div class="d-md-flex justify-end">
-                            <div class="ml-5" style="cursor: pointer" v-text="$root.label('about_header')" @click="dialog.about = true"></div>
-                            <div class="ml-5" style="cursor: pointer" v-text="$root.label('license_header')" @click="dialog.license = true"></div>
-                            <div class="ml-5"><a href="https://www.bbaw.de/datenschutz" target="_blank" class="white--text" v-text="$root.label('consent_declaration')"></a></div>
+                        <div class="d-flex flex-wrap justify-end">
+                            <div class="mr-5" style="cursor: pointer" v-text="$root.label('about_header')" @click="dialog.about = true"></div>
+                            <div class="mr-5" style="cursor: pointer" v-text="$root.label('license_header')" @click="dialog.license = true"></div>
+                            <div><a href="https://www.bbaw.de/datenschutz" target="_blank" class="white--text" v-text="$root.label('consent_declaration')"></a></div>
                         </div>
                     </v-footer>
 
