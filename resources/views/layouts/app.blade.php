@@ -221,13 +221,6 @@
                         </div>
                     </v-app-bar>
 
-<!-- Beta
-<div class="title text-center red--text" style="width: 100%; z-index:20; position: absolute; top: 68px">
-    <span>Diese Seite befindet sich noch im Aufbau. Bitte nutzen Sie die</span>
-    <a href="http://cil-old.bbaw.de/dateien/datenbank.php">alten Seite.</a>
-</div>-->
-
-
                     <!-- Routed Component -->
                     <v-main class="app_bg" style="background: url('/ace/img/background.jpg')">
                         <div style="border-top: 5px solid #b51212; padding: 3rem 0; border-top-left-radius:220px 100px;">
@@ -249,7 +242,7 @@
                         <v-card-text class="caption text-justify mt-n3">
                             <span v-text="$root.label('consent_note')"></span>
                             <a
-                                href="https://www.bbaw.de/datenschutz"
+                                href="https://cil.bbaw.de/index.php?id=9"
                                 target="_blank"
                                 class="font-weight-bold"
                                 style="text-decoration: none"
@@ -274,7 +267,7 @@
                         <div class="d-flex flex-wrap justify-end">
                             <div class="mr-5" style="cursor: pointer" v-text="$root.label('about_header')" @click="dialog.about = true"></div>
                             <div class="mr-5" style="cursor: pointer" v-text="$root.label('license_header')" @click="dialog.license = true"></div>
-                            <div><a href="https://www.bbaw.de/datenschutz" target="_blank" class="white--text" v-text="$root.label('consent_declaration')"></a></div>
+                            <div><a href="https://cil.bbaw.de/index.php?id=9" target="_blank" class="white--text" v-text="$root.label('consent_declaration')"></a></div>
                         </div>
                     </v-footer>
 
@@ -337,14 +330,14 @@
                                     <a href="https://cil.bbaw.de/index.php?id=17" target="_blank" v-text="$root.label('fotos')"></a>:
                                     <span v-text="$root.label('license_right_ask')"></span>
                                 </p>
-                                <p>
+                                <!--<p>
                                     <b v-text="$root.label('license_sw')"></b><br />
                                     ACE App<br />
                                     <a href="https://www.apache.org/licenses/LICENSE-2.0.html" target="_blank">Apache&nbsp;Software, License Version 2.0</a><br />
                                     <span v-text="$root.label('license_available')"></span>
                                     <a href="https://github.com/" target="_blank">Github</a><br />
                                     <span v-text="$root.label('license_author')"></span>: Jan Köster
-                                </p>
+                                </p>-->
                             </div>
                             <div class="mb-n3 d-flex justify-center"><v-btn text @click="dialog.license=false">Close</v-btn></div>
                         </v-card-text>

@@ -83,7 +83,7 @@
                         </v-col>
                     </v-row>
 
-                    <div class="body-1 mb-n2 mt-n1"><b>Ansprechpartner:</b> <a href="mailto:dbcil@bbaw.de">Dipl.-Hist. Marcus Dohnicht</a></div>
+                    <div class="body-1 mb-n2 mt-n1"><b>{{ $root.label('contactperson') }}:</b> <a href="mailto:dbcil@bbaw.de">Dipl.-Hist. Marcus Dohnicht</a></div>
                 </v-card-text>
             </v-expand-transition>
         </v-card>
@@ -254,7 +254,7 @@
                                     >
                                         <div
                                             class="caption text-uppercase"
-                                            v-text="r.link ? '3D Scan' : $root.label('img_private')"
+                                            v-text="r.link ? '3D Scan' : (!r.is_public ? $root.label('img_private') : $root.label('no_digital'))"
                                         ></div>
                                     </div>
                                     <v-img
@@ -262,7 +262,7 @@
                                         aspect-ratio="1"
                                         :src="r.img"
                                         style="cursor: pointer"
-                                        @error="r.is_public = 0"
+                                        @error="r.error = 1"
                                         @click="clickImage(record, r)"
                                     ></v-img>
                                 </v-responsive>
@@ -659,6 +659,7 @@ export default {
                     resources = []
                     content[key].forEach((r) => {
                         r.is_public = r.is_public === 0 ? 0 : 1
+                        r.error = 0
                         r.img = r.is_public ? (this.silo + (key === 'imprints' ? 'P' : '') + r.fmid + '.jpg') : null
                         resources.push(r)
                     })
@@ -680,7 +681,10 @@ export default {
     },
 
     clickImage (record, r) {
-        if (r.is_public) {
+        if (r.error) {
+            alert(this.$root.label('no_digital'))
+        }
+        else if (r.is_public) {
             this.ImageDialog(record, r)
         }
         else if (record === 'imprints' && r.link) {

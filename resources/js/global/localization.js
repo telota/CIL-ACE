@@ -27,6 +27,7 @@ export default {
                 accept: 'Akzeptieren',
                 decline: 'Ablehnen',
 
+                contactperson: 'Ansprechpartner',
                 abbreviations: 'Abkürzungen',
                 abbreviations_copy: 'Abkürzung in Suchfeld kopieren',
                 abbreviations_note: 'Für die Suche nach anderen Editionen siehe die verbindlichen <b>Abkürzungen</b>.',
@@ -77,6 +78,7 @@ export default {
                 accept: 'Accept',
                 decline: 'Decline',
 
+                contactperson: 'Contact',
                 abbreviations: 'Abbreviations',
                 abbreviations_copy: 'Copy abbreviation to search form.',
                 abbreviations_note: 'To search for other editions, see the authoritative <b>abbreviations</b>.',
@@ -93,7 +95,7 @@ export default {
                 imprints_3d: '3D Imprints',
                 inscription: 'Inscription',
                 inscriptions: 'Inscriptions',
-                no_digital: 'No digitized copy',
+                no_digital: 'No scan',
                 no_records: 'No matching records found.',
                 only_3d: '3D imprint only',
                 processing: 'Processing Your request ...',
