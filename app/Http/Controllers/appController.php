@@ -10,16 +10,22 @@ use Response;
 class appController extends Controller {
 
     public function initiate () {
-
-        return view ('layouts.app', ['app' => [
-            'language'  => substr(Request::server('HTTP_ACCEPT_LANGUAGE'), 0, 2) === 'de' ? 'de' : 'en'
-        ]]);
+        return view ('layouts.app', [
+            'app' => [
+                'language'  => substr(Request::server('HTTP_ACCEPT_LANGUAGE'), 0, 2) === 'de' ? 'de' : 'en'
+            ]
+        ]);
     }
 
-    public function provideJS ($file) {
-        $contents = \File::get('/opt/projects/'.(is_dir('/opt/projects/cil/src') ? 'cil' : 'cil-laravel').'/src/public/js/'.$file);
-        $response = Response::make($contents, 200);
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
+    public function uri ($param) {
+        if (strtolower(substr($param, 0, 2)) === 'ko') { $param = substr($param, 2); }
+        $id = intval($param);
+
+        if ($id > 0) {
+            return redirect('/ace#/ko/'.$id);
+        }
+        else {
+            die (abort(404, "No valid ID given."));
+        }
     }
 }

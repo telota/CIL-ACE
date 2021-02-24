@@ -13,14 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::match    (['get', 'post'], '/',    function () {
+/*Route::match    (['get', 'post'], '/',    function () {
     return '404: Please specifiy the page you would like to visit.';
+});*/
+
+Route::get('/', function () {
+    return redirect('/ace');
 });
 
-//Route::get ('/ace/js/{file}', 'appController@provideJS');
-//Route::get ('/ace/css/{file}', function ($file) { return \File::get('/css/'.$file); });
+Route::get('/ace/id/{id}', 'appController@uri');
 
-Route::get ('/ace', 'appController@initiate');
+Route::get('/ace', 'appController@initiate');
 
 /*Route::get('/', function () {
     return view('welcome');
