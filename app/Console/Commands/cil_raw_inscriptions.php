@@ -11,7 +11,7 @@ class cil_raw_inscriptions extends Command
     protected $description  = 'read raw CSVs of concordances/inscriptions';
     public function __construct() { parent::__construct(); }
 
-    static $date = '210902';
+    static $date = '210209';
     static $path = '/opt/projects/cil-laravel/output/';
     static $table_base = 'raw';
     static $data = [

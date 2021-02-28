@@ -10,7 +10,7 @@ class cil_raw_resources extends Command {
     protected $description  = 'read raw CSVs of Fotos, Imprints and Scheden';
     public function __construct() { parent::__construct(); }
 
-    static $date = '210902';
+    static $date = '210209';
     static $path = '/opt/projects/cil-laravel/output/';
     static $table_base = 'raw';
     static $resources = [
