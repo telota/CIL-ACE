@@ -81,16 +81,30 @@ class export_resources extends Command {
 
         // Server Index
         echo 'Get Server Index ... ';
-        $index = json_decode(file_get_contents(self::$path.'index_2021-02-26.json'), true);
+        $index_raw = json_decode(file_get_contents(self::$path.'index_2021-02-28.json'), true);
+        $index = [];
+        foreach ($index_raw as $i) {
+            if ($i !== '.DS_Store') { $index[$i] = $i; }
+        }
         echo count($index)." records\n";
 
         // Processing
         echo 'Processing ... ';
         $items = [];
-        foreach ($resources AS $r) {
+        foreach ($resources AS $key => $r) {
             foreach ($r AS $i) {
-                $found = false;
-                if ($i['p'] === 1) { $found = in_array($i['d'], $index) ? true : false; }
+                if ($i['p'] === 0) {
+                    $found = false;
+                }
+                else {
+                    if (empty($index[$i['d']])) {
+                        $found = false;
+                        if ($key !== 'imprints') { $missing[$key][] = $i['d']; }
+                    }
+                    else {
+                        $found = true;
+                    }
+                }
 
                 echo "\t".implode(', ', array_merge($i, [$found === true ? 1 : 0]))."\n";
 
@@ -108,7 +122,7 @@ class export_resources extends Command {
         echo count($items)." records\n";
 
         // Writing CSV
-        echo("\n".'WRITING CSV FIle ... '."\n");
+        echo("\n".'WRITING CSV File ... '."\n");
         $fp = fopen(self::$path.'cil_ace_'.self::$date.'_resources.csv', 'w');
 
         fputcsv($fp, ['Konkordanznnumer', 'Ressource', 'Nummer', 'Dateiname', 'Link', 'Anmerkung']);
@@ -122,6 +136,26 @@ class export_resources extends Command {
         }
         fclose($fp);
         echo("SUCCESS\n");
+
+        // Writing $missing
+        if (isset($missing)) {
+            foreach($missing as $mkey => $miss) {
+                sort($miss);
+                if ($mkey === 'fotos' && empty($miss[0])) { unset($miss[0]); }
+                echo 'WRITING missing '.$mkey.' JSON File ... ';
+                file_put_contents(self::$path.'cil_ace_'.self::$date.'_missing_'.$mkey.'.json', json_encode($miss));
+                echo 'SUCCESS'."\n";
+
+                echo 'WRITING missing '.$mkey.' CSV File ... ';
+                $fp = fopen(self::$path.'cil_ace_'.self::$date.'_missing_'.$mkey.'.csv', 'w');
+                fputcsv($fp, ['Dateiname']);
+                foreach ($miss AS $m) {
+                    fputcsv($fp, [$m]);
+                }
+                fclose($fp);
+                echo("SUCCESS\n");
+            }
+        }
 
         echo("\n\nExecution time: ".(date('U') - $time)." sec\n");
         die(
