@@ -112,9 +112,9 @@ class export_resources extends Command {
                     $i['k'],
                     $i['t'],
                     $i['n'],
-                    ($found === true ? $i['d'] : null),
-                    ($found === true ? $file_base.$i['d'] : null),
-                    ($i['p'] === 0 ? 'nicht öffentlich, nur auf Anfrage' : ($found === false ? 'noch nicht digitalisiert' : null))
+                    ($i['p'] === 0 || ($key === 'imprints' && $found === false) ? null : $i['d']),
+                    ($i['p'] === 0 || ($key === 'imprints' && $found === false) ? null : $file_base.$i['d']),
+                    ($i['p'] === 0 ? 'nicht öffentlich, nur auf Anfrage' : ($found === false ? ($key === 'imprints' ? 'noch nicht digitalisiert' : 'demnächst verfügbar') : null))
                 ];
             }
         }

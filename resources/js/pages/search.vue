@@ -254,7 +254,7 @@
                                     >
                                         <div
                                             class="caption text-uppercase"
-                                            v-text="r.link ? '3D Scan' : (!r.is_public ? $root.label('img_private') : $root.label('no_digital'))"
+                                            v-text="r.link ? '3D Scan' : (!r.is_public || record !== 'imprints' ? $root.label('img_private') : $root.label('no_digital'))"
                                         ></div>
                                     </div>
                                     <v-img
@@ -682,7 +682,7 @@ export default {
 
     clickImage (record, r) {
         if (r.error) {
-            alert(this.$root.label('no_digital'))
+            alert(this.$root.label(record === 'imprints' ? 'no_digital' : 'img_private'))
         }
         else if (r.is_public) {
             this.ImageDialog(record, r)
