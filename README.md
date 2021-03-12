@@ -12,7 +12,7 @@ The CIL has globally at its disposal the largest existent collection of photos a
 
 This long-term Academy Project is part of the [Research Centre for Primary Sources of the Ancient World](https://www.bbaw.de/forschung/zentren/zentrum-alte-welt) at the [Berlin-Brandenburg Academy of Sciences and Humanities](https://www.bbaw.de/).  
  
-The Academy research project “Corpus Inscriptionum Latinarum” is part of the [Academies' Programme](https://www.akademienunion.de/en/research/the-academies-programme), a research funding programme co-financed by the German federal government and individual federal states. Coordinated by the [Union of the German Academies of Sciences and Humanities] (https://www.akademienunion.de/en/union/about-us), the Programme intends to retrieve and explore our cultural heritage, to make it accessible and highlight its relevance to the present, as well as to preserve it for the future.
+The Academy research project “Corpus Inscriptionum Latinarum” is part of the [Academies' Programme](https://www.akademienunion.de/en/research/the-academies-programme), a research funding programme co-financed by the German federal government and individual federal states. Coordinated by the [Union of the German Academies of Sciences and Humanities](https://www.akademienunion.de/en/union/about-us), the Programme intends to retrieve and explore our cultural heritage, to make it accessible and highlight its relevance to the present, as well as to preserve it for the future.
 
 ## About the ACE App
 
