@@ -30,6 +30,7 @@ However, feel free to reuse the code for your personal projects as you wish.
 * [Vuetify 2.3.7](https://vuetifyjs.com/en/)
 * [Vue Router 3.0.1](https://router.vuejs.org/)
 * [Vuex 3.0.1](https://vuex.vuejs.org/)
+* [vue-progressbar](https://github.com/hilongjw/vue-progressbar)
 
 ## Realization and Licensing
 
