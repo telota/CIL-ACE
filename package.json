@@ -19,8 +19,6 @@
     "sass-loader": "^8.0.0"
   },
   "dependencies": {
-    "dropzone": "^5.2.0",
-    "moment": "^2.21.0",
     "vue": "^2.6.0",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.0.1",
