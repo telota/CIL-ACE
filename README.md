@@ -1,61 +1,38 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# CIL | ACE - Archivum Corporis Electronicum
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## About the CIL Project
 
-## About Laravel
+**The goal of the “Corpus Inscriptionum Latinarum” (CIL) is systematically to collect and publish all ancient Latin inscriptions of the Roman world.**  
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Since its inception under Theodor Mommsen in 1853, the ["Corpus Inscriptionum Latinarum" (CIL)](https://cil.bbaw.de/) has been the definitive documentary project of the epigraphic patrimony of Roman antiquity. A systematic and text-critical collection of all known inscriptions of the Roman Imperium, the CIL, with its geographical as well as thematic arrangement, is an indispensable tool in the field of classical studies. The Corpus is continually expanded and updated in international collaboration with various scholars and research institutions to reflect and include the latest developments in classical research.  
+ 
+The online database ["Archivum Corporis Electronicum" (ACE)](https://cil.bbaw.de/ace) contains documentation of the epigraphic work of the CIL, carefully collected since the beginning of the project: photos, squeezes (or ‘rubbings’ / ectypa), drawings and sketches, as well as index cards relating to individual inscriptions. The Archive is continually amplified with materials from all phases of the project. Not only would the corresponding materials of the Archive represent the sole remaining descriptive source should any particular inscription become lost, but they frequently also contain more information than was printed in the CIL volumes of the 19th and early 20th centuries, particularly regarding the nature of the objects which carry the inscriptions.  
+ 
+The CIL has globally at its disposal the largest existent collection of photos and squeezes of Latin inscriptions, which can be researched according to various criteria when used alongside superordinate epigraphic databanks.  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This long-term Academy Project is part of the [Research Centre for Primary Sources of the Ancient World](https://www.bbaw.de/forschung/zentren/zentrum-alte-welt) at the [Berlin-Brandenburg Academy of Sciences and Humanities](https://www.bbaw.de/).  
+ 
+The Academy research project “Corpus Inscriptionum Latinarum” is part of the [Academies' Programme][https://www.akademienunion.de/en/research/the-academies-programme), a research funding programme co-financed by the German federal government and individual federal states. Coordinated by the [Union of the German Academies of Sciences and Humanities] (https://www.akademienunion.de/en/union/about-us), the Programme intends to retrieve and explore our cultural heritage, to make it accessible and highlight its relevance to the present, as well as to preserve it for the future.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## About the ACE App
 
-## Learning Laravel
+The app provides a minimalist access to the inscriptions published by the CIL and their digital resources. It is designed to be as basic and modular as possible, consisting of a MySQL PHP Backend/JSON-API and a Vue.js Single Page Application as Frontend.  
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Since the network infrastructure of the BBAW requires a special server configuration, it is not easily possible to use the app in another environment, especially as the database is currently not accessible externally.  
+However, feel free to reuse the code for your personal projects as you wish.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Dependencies
 
-## Laravel Sponsors
+* [Laravel ^7.29](https://laravel.com/)
+* [PHP 7.2.5](https://www.php.net/)
+* [MySQL 5.6](https://www.mysql.com/)
+* [Vue.js 5.6](https://vuejs.org/)
+* [vuetify 2.3.7](https://vuetifyjs.com/en/)
+* [Vue Router 3.0.1](https://router.vuejs.org/)
+* [Vuex 3.0.1](https://vuex.vuejs.org/)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Realization and Licensing
 
-### Premium Partners
+2021 [Berlin-Brandenburg Academy of Sciences and Humanities](https://www.bbaw.de/), [TELOTA - IT/DH](https://www.bbaw.de/en/bbaw-digital/telota), [Jan Köster](https://orcid.org/0000-0003-2713-5207)   
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[APACHE LICENSE, VERSION 2.0](https://www.apache.org/licenses/LICENSE-2.0) 
